@@ -23,7 +23,7 @@
               {% endif %}
 
               {%- if block.settings.link != blank -%}
-                <a href="{{ block.settings.link }}" class="infor-bar__link !no-underline block hover:!underline" {%- if section.settings.text_color -%}style="color:{{- section.settings.text_color -}};"{%- endif -%}{% if block.settings.open_infor_new_window %} onclick='return tt.launchWorkflow(this);' target="_blank"{% endif %}>
+                <a class="infor-bar__link !no-underline block hover:!underline" {%- if block.settings.click_event_function_name != blank -%}onclick="{{ block.settings.click_event_function_name }}()"{% else %}href="{{ block.settings.link }}"{%- endif -%} {%- if section.settings.text_color -%}style="color:{{- section.settings.text_color -}};"{%- endif -%}{% if block.settings.open_infor_new_window %} onclick='return tt.launchWorkflow(this);' target="_blank"{% endif %}>
               {%- endif -%}
                   <span class="infor-bar__message block font-medium text-xs xl:text-sm xl:leading-5.5 whitespace-nowrap" {%- if section.settings.text_color -%}style="color:{{- section.settings.text_color -}};"{%- endif -%}>
                     {{ block.settings.text | escape }}
@@ -37,6 +37,15 @@
       {%- endfor -%}
     </div>
   </div>
+  <script>
+    var script = document.createElement("script");
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("src", "https://d3aq2u4yw77ivo.cloudfront.net/retailer-appointment/shoesandsox/bookAStylist.shoesandsox.prod.js");
+    document.body.appendChild(script);
+    script.onload = function(){
+      window.Brauz.initializeBrauzBookAStylist("SHOESANDSOX");
+    };
+  </script>
 </div>
 
 {% schema %}
@@ -112,7 +121,13 @@
           "id": "open_infor_new_window",
           "label": "Open link in new tab",
           "default": false
+        },
+        {
+          "type": "text",
+          "id": "click_event_function_name",
+          "label": "Click event function name"
         }
+        
       ]
     }
   ],
