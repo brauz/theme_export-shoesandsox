@@ -1,0 +1,158 @@
+{% section 'breadcrumb' %}
+{% if settings.login_account_image == blank and settings.login_account_image_mobile == blank %}
+  {% assign check = false %}
+{% else %}
+  {% assign check = true %}
+{% endif %}
+<div class="flex items-center flex-wrap md:px-4 xl:px-20 mx-auto md:pb-9 lg:pb-18">
+  <div class="w-full h-full{% if check %} md:max-w-48.4375-percent order-1 md:order-2{% endif %}">
+    {% if settings.login_account_image != blank %}
+      {% if settings.login_account_url != blank %}
+        <a {% if settings.login_account_new_tab %}target="_blank" href="{{ settings.login_account_url }}"{% endif %}
+      {% else %}
+        <div 
+      {% endif %} 
+      class="{% if settings.login_account_image_mobile != blank %}!hidden md:!block {% endif %} rounded-sm group relative w-full block overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1">
+        <img src="{{ settings.login_account_image | image_url: width: settings.login_account_image.width }}" loading="lazy" width="{{ settings.login_account_image.width }}" height="{{ settings.login_account_image.height }}"  alt="{{ settings.login_account_image.alt }}" class="block w-full h-full object-center object-cover max-w-full">
+      {% if settings.login_account_url != blank %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %} 
+    {% endif %}
+    {% if settings.login_account_image_mobile != blank %}
+      {% if settings.login_account_url != blank %}
+        <a {% if settings.login_account_new_tab %}target="_blank" href="{{ settings.login_account_url }}"{% endif %}
+      {% else %}
+        <div
+      {% endif %} class="{% if settings.login_account_image != blank %}md:!hidden {% endif %} rounded-sm group relative w-full block overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1">
+        <img src="{{ settings.login_account_image_mobile | image_url: width: settings.login_account_image_mobile.width }}" loading="lazy" width="{{ settings.login_account_image_mobile.width }}" height="{{ settings.login_account_image_mobile.height }}"  alt="{{ settings.login_account_image_mobile.alt }}" class="block w-full h-full object-center object-cover max-w-full">
+      {% if settings.login_account_url != blank %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="order-2 md:order-1 w-full h-full flex items-center justify-center py-8 px-4{% if check %} md:pl-0 xl:px-10 xl:pr-31.5 md:max-w-51.5625-percent{% else %} max-w-51.5625-percent mx-auto{% endif %}">
+    <div x-show="loginForm" id="loginForm" class="w-full">
+      <div class="text-center md:text-left">
+        <h1 class=" text-grey-900 font-bold text-2xl md:text-3xl w-full mb-2">Sign in to your account</h1>
+        <div class="text-sm leading-5.5 text-grey-700">
+          <span class="inline-block">Or </span>
+          <a class="underline text-grey-700 hover:text-accent-1" href="{{ routes.account_register_url }}">Create an account</a>
+        </div>
+        {% if settings.login_content != blank %}
+          <span class="mt-2 block">{{ settings.login_content }}</span>
+        {% endif %}
+      </div>
+      <div>
+        {% form 'customer_login', novalidate: 'novalidate' %}
+          {%- if form.errors -%}
+            <div class="message message-error my-4" role="alert">
+              <strong>There were errors with your submission</strong>
+              {{ form.errors | default_errors }}
+              <div class="close-message">
+                {% render 'icon-close-error' %}
+              </div>
+            </div>
+          {%- endif -%}
+          <div class="field__input w-full my-4 xl:mt-5">
+            <input
+              type="email"
+              name="customer[email]"
+              id="email_address"
+              class="w-full"
+              autocomplete="email"
+              placeholder="Email">
+              <label for="email_address">Email</label>
+          </div>
+          {% if form.password_needed %}
+            <div class="field__input w-full mb-4">
+              <input
+                type="password"
+                name="customer[password]"
+                id="password"
+                class="w-full"
+                autocomplete="current-password"
+                placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+          {% endif %}
+
+          <div class="mb-4">
+            <a
+              id="forGotPassword"
+              href="#"
+              class="underline block text-sm leading-5.5 text-grey-700 hover:text-accent-1">
+              Forgot your password?
+            </a>
+          </div>
+          <button type="submit" class="block relative w-full btn-primary show-shadow !py-3">
+            Sign In
+          </button>
+          <input name="return_to" type="hidden" value="/account">
+        {% endform %}
+      </div>
+
+      {% if shop.checkout.guest_login %}
+        {% form 'guest_login', novalidate: 'novalidate' %}
+          <button type="submit" class="block relative w-full btn-primary show-shadow mt-4 !py-3">
+            Continue as a guest
+          </button>
+        {% endform %}
+      {% endif %}
+    </div>
+    <div id="recoverForm" class="w-full hidden">
+      <div class="text-center md:text-left">
+        <h1 class="text-grey-900 font-bold text-2xl md:text-3xl w-full mb-2">Recover your password</h1>
+        <div class="text-sm leading-5.5 text-grey-700">
+          <span class="inline-block">Or </span>
+          <a id="backToLogin" href="#" class="underline hover:text-accent-1">Back to login</a>
+        </div>
+      </div>
+      <div class="w-full">
+        {% form 'recover_customer_password', id: 'recover_customer_password', novalidate: 'novalidate' %}
+          {% assign recover_success = form.posted_successfully? %}
+          {%- if form.errors -%}
+            <div class="recover-message message message-error my-4" role="alert">
+              <strong>There were errors with your submission</strong>
+              {{ form.errors | default_errors }}
+              <div class="close-message">
+                {% render 'icon-close-error' %}
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if recover_success == true -%}
+            <div class="recover-message message message-success my-4 " role="alert">
+              <strong>Success</strong>
+              <ul>
+                <li>
+                  {{ 'customer.recover_password.success' | t }}
+                </li>
+              </ul>
+              <div class="close-message">
+                {% render 'icon-success-message' %}
+              </div>
+            </div>
+        {%- endif -%}
+          <div class="field__input w-full my-4 xl:mt-5">
+            <input
+              type="email"
+              name="email"
+              id="email"
+              autocomplete="email"
+              class="w-full"
+              placeholder="Email">
+              <label for="email">Email</label>
+          </div>
+          <button type="submit" class="block relative w-full btn-primary show-shadow !py-3">
+            Recover Password
+          </button>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</div>
+{% capture src_url %}{{ 'login.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}

@@ -1,0 +1,73 @@
+<div class="{{ section.class }} md:pb-16 pb-6 {% if section.settings.enable_border_bottom %}border-b border-border-default{% endif %}">
+    <div class="flex flex-wrap gap-y-10 gap-x-4">
+        {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+                <div class="text-center w-full-8 md:w-full-4/20 flex flex-col">
+                    {% if block.settings.image != blank %}
+                        <img src="{{ block.settings.image | image_url: width: block.settings.image.width }}" alt="" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" class="mx-auto">
+                    {% endif %}
+                    {% if block.settings.title != blank %}
+                        <h2 class="no-underline block text-base md:text-lg text-grey-900 hover:!text-grey-700 font-bold m-0 mt-4 md:mt-5 mb-4 md:mb-5 leading-6">{{ block.settings.title }}</h2>
+                    {% endif %}
+                    {% if block.settings.text_link != blank %}
+                        <a href="{{ block.settings.url_text }}" class="no-underline inline-block md:inline-block text-sm text-grey-900 font-bold pb-1.5 border-b-2 border-accent-4 hover:border-grey-900 leading-5.5 transition-all w-fit mx-auto mt-auto">{{ block.settings.text_link }}</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% capture src_url %}{{ 'template-contact.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-contact.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+    {
+        "name": "Contact Image Text",
+        "class": "contact-image-text",
+        "settings": [
+            {
+                "type": "checkbox",
+                "id": "enable_border_bottom",
+                "label": "Enable Border Bottom",
+                "default": false
+            }
+        ],
+        "blocks": [
+            {
+                "type": "image_text",
+                "name": "Image Text",
+                "settings": [
+                    {
+                        "type": "image_picker",
+                        "id": "image",
+                        "label": "Image"
+                    },
+                    {
+                        "type": "text",
+                        "id": "title",
+                        "label": "Title"
+                    },
+                    {
+                        "type": "text",
+                        "id": "text_link",
+                        "label": "Text Link",
+                        "default": "Learn More"
+                    },
+                    {
+                        "type": "url",
+                        "id": "url_text",
+                        "label": "Url Text"
+                    }
+                ]
+            }
+        ],
+        "presets": [
+            {
+                "name": "Contact Image Text"
+            }
+        ]
+    }
+{% endschema %}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ direction }}" class="{{ checkout_html_classes }}">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, user-scalable=0">
+    <meta name="referrer" content="origin">
+
+    <title>{{ page_title }}</title>
+
+    {{ content_for_header }}
+
+    {{ checkout_stylesheets }}
+    {{ checkout_scripts }}
+    {{ 'font.css' | asset_url | stylesheet_tag }}
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+    </head>
+    <body>
+    {{ skip_to_content_link }}
+
+    <header class="block checkout-header xlxs:py-8 py-5 xlxs:border-b xlxs:border-solid xlxs:border-border-default" data-header role="banner">
+        <div class="wrap py-0.5 block">
+            {{ content_for_logo }}
+        </div>
+    </header>
+
+    {{ order_summary_toggle }}
+    <div class="content checkout_main" data-content>
+        <div class="wrap">
+            <div class="main">
+                {{ breadcrumb }}
+                {{ alternative_payment_methods }}
+                <main class="main__content" role="main">
+                {{ content_for_layout }}
+                </main>
+                <footer class="main__footer border-border-default xlxs:w-full w-full-x32 xlxs:ml-0 -ml-4 xlxs:px-0 px-6" role="contentinfo">
+                    {% section 'checkout-footer' %}
+                </footer>
+            </div>
+            <aside class="sidebar" role="complementary">
+                <div class="sidebar__content">
+                {{ content_for_order_summary }}
+                </div>
+            </aside>
+        </div>
+    </div>
+    {% if settings.enable_brauz == true %}
+        <script>
+            // check if order type is Click & Collect by checking "product description property" in order summary
+            var descriptions = document.querySelectorAll(".product__description__property.order-summary__small-text");
+            var is_click_and_collect_order = false;
+            for (let i = 0; i < descriptions.length; i++) {
+            var description = descriptions[i].textContent.trim().toLowerCase();
+            if (
+                description.indexOf("click & collect") !== -1 ||
+                description.indexOf("pick up") !== -1
+            ) {
+                is_click_and_collect_order = true;
+                break;
+            }
+            }
+
+            if (is_click_and_collect_order === true) {
+                if (Shopify.Checkout.step === "contact_information") {
+                    // add text under "Shipping address" header in Checkout page
+                    var shipping_address_section_header_el = document.querySelector("[data-shipping-address] .section__header");
+                    var text = document.createElement("p");
+                    text.setAttribute("class", "section__text");
+                    text.innerText = "Please add the First Name & Last Name of the person collecting your order. The address provided is the pickup location for your order and should not be changed.";
+                    shipping_address_section_header_el.appendChild(text);
+                } else if (Shopify.Checkout.step === "payment_method") {
+                    // automatically select option "Use a different billing address"
+                    var different_billing_address_label = document.querySelector("[for='checkout_different_billing_address_true']");
+                    different_billing_address_label.click();
+
+                    // disable/remove option "Same as shipping address"
+                    var same_as_shipping_input = document.getElementById("checkout_different_billing_address_false");
+                    var same_as_shipping_wrapper = same_as_shipping_input.parentNode.parentNode;
+                    same_as_shipping_wrapper.style.display = "none";
+
+                    // remove top-border property of option "Use a different billing address"
+                    var different_billing_address_wrapper = different_billing_address_label.parentNode;
+                    different_billing_address_wrapper.style.borderTop = "none";
+                }
+            }
+        </script>
+    {% endif %}
+
+    {{ tracking_code }}
+    {% render 'checkout-variables' %}
+    <script src="{{ 'sup-checkout.js' | asset_url }}" defer="defer"></script>
+    <script src="https://d3aq2u4yw77ivo.cloudfront.net/find-in-store/shopify/shoesandsox/find-in-store.shopify.shoesandsox.prod.js" defer></script>
+    </body>
+</html>
+<script src="{{ 'checkout.js' | asset_url }}" defer="defer"></script>

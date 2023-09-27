@@ -1,0 +1,31 @@
+{% comment %} Bazaar Reviews {% endcomment %}
+<div data-block-name="review" class="border-t border-border-default px-0 md:px-4 xl:px-20 mx-auto">
+	<div class="overflow-hidden mt-8 md:mt-x72 mb-8 md:mb-x60">
+		<div class="flex items-center justify-between mb-4 md:mb-6 text-center px-4 md:px-0">
+			<h3 class="text-xl md:text-2xl font-bold text-grey-900 m-0">Customer Reviews</h3>	
+		</div>
+		<div data-bv-show="reviews" data-bv-product-Id="{{ product.id }}" class="mx-auto overflow-hidden">
+			{% if product.metafields.bazaarvoice.reviews %}
+				{{ product.metafields.bazaarvoice.reviews }}
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<script>
+	function scrollToReviews() {
+		document.querySelector('[data-block-name="review"]')?.scrollIntoView({ block: 'start',  behavior: 'smooth' });
+	}
+</script>
+
+{% schema %}
+    {
+        "name": "Bazaar Ratings",
+		"settings": [],
+		"presets": [
+            {
+                "name": "Bazaar Ratings"
+            }
+        ]
+    }
+{% endschema %}

@@ -1,0 +1,21 @@
+<div class="block xl:hidden megamenu-mobile-quick-links w-full bg-grey-100">
+  <ul class="menu-quick-links list-none py-8 px-4">
+    {% for mainBlock in blocks %}
+      {% for i in (1..3) %}
+      {% assign image_mb = 'image_' | append: i %}
+      {% assign text_mb = 'title_' | append: i %}
+      {% assign url_mb = 'url_' | append: i %}
+        {% if mainBlock.type == 'mobile-item' %}
+          {% if mainBlock.settings[text_mb] != blank or mainBlock.settings[url_mb] != blank or mainBlock.settings[image_mb] != blank %}
+          <li class="select-store last:pb-0 pb-5 list-none flex items-center">
+            <img src="{{ mainBlock.settings[image_mb] | img_url: 'master'}}" class="w-5 h-5 object-contain mr-3" loading="lazy">
+            <a class="no-underline font-normal text-sm leading-5.5 text-grey-700" href="{{ mainBlock.settings[url_mb] }}">
+              <span>{{ mainBlock.settings[text_mb] }}</span>
+            </a>
+          </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </ul>
+</div>

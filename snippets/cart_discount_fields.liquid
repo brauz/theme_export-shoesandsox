@@ -1,0 +1,50 @@
+{% if settings.plus_display_discount_code %}
+{% capture src_url1 %}{{ 'load-discount.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url1, priority: 'normal', type: "defer" %}
+{{ 'cart-discount.css' | asset_url | stylesheet_tag }}
+<div class="discountcodefield pb-4 mb-4 border-b border-border-default"> 
+  <div id="discount-title" class="text-base font-bold text-grey-900 mb-2 active cursor-pointer relative">Apply Discount <span class="text-primary minus"><svg
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      role="presentation"
+      class="icon icon-minus"
+      fill="none"
+      viewBox="0 0 10 2">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z"
+        fill="currentColor">
+    </svg></span>
+    <span class="text-primary plus hidden"><svg
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      role="presentation"
+      class="icon icon-plus"
+      fill="none"
+      viewBox="0 0 10 10">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z"
+        fill="currentColor">
+    </svg></span></div>
+  <div id="discount-container" class="overflow-hidden discount-active">
+      <div class="field field--custom flex">
+          <div class="field__input">
+              <input autocomplete="off" class="w-full !border-r-0 !mb-0" type="text" name="discount" id="discount" placeholder="Enter code"/>
+              <label for="discount">Enter code</label>
+          </div>
+          <button id="btn-discount-code" class="inline-flex bg-primary border border-primary rounded-sm font-bold px-4 py-3 text-grey-900 hover:text-grey-900">
+            <span class="text-white">Apply</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M20 10c0 5.523-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0v2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8h2z"></path></svg>          
+          </button>
+      </div>
+      <div class="tags-list"></div>
+      <span class="error-message"></span>
+      <div id="warning-mess" class="mt-4"></div>
+  </div>
+</div> 
+{% endif %}

@@ -1,0 +1,15 @@
+{% comment %} Do not define properties in the object. Do not redefine this object. New properties should be added as CD_STATE.myProp = { whatever: 'you need' } {% endcomment %}
+<script>
+    const CD_STATE = {}
+    CD_STATE.storefrontApi = {
+        storefrontAccessToken: {{ settings.storefront_access_token | json }},
+        graphQlEndpoint: "https://{{ shop.permanent_domain }}/api/2023-01/graphql.json"
+    }
+</script>
+<script>
+    window.variantStrings = {
+        soldOut: "Sold out",
+        addToCart: "{{ 'general.add_to_cart' | t }}",
+        unavailable: "Unavailable"
+    }
+</script>

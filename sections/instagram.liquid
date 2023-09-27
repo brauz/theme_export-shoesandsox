@@ -1,0 +1,124 @@
+{% capture src_url %}{{ 'instagram.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{{ 'instagram.css' | asset_url | stylesheet_tag }}
+<style>
+  [data-section-id="{{ section.id }}"] {
+    padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+    padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+  }
+  @media (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+    }
+  }
+  @media (min-width: 1024px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+    }
+  }
+</style>
+<section class="{% if section.settings.border_bottom %}border-b border-border-default {% endif %}px-4 xl:px-20 mx-auto fs-section" data-section-id="{{ section.id }}">
+  {% if section.settings.title != blank %}
+    <h3 class="text-xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold mb-5 lg:mb-8 text-center">{{ section.settings.title }}</h3>
+  {% endif %} 
+  {{ section.settings.code }}
+</section>
+
+{% schema %}
+{
+  "name": "Instagram",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "border_bottom",
+      "label": "Enable border bottom"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Instagram",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "code",
+      "label": "Embed Code",
+      "info": "Paste your generated Foursixty code here."
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "range",
+      "id": "pd_top_dt",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_dt",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Tablet"
+    },
+    {
+      "type": "range",
+      "id": "pd_top_tl",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_tl",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "pd_top_mb",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_mb",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram",
+      "category": "Foursixty"
+    }
+  ]
+}
+{% endschema %}

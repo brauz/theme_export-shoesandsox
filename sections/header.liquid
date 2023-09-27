@@ -1,0 +1,441 @@
+{% capture menu_url %}
+  {{ 'menu.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: menu_url, priority: 'normal', type: "defer" %}
+{{ 'menu.css' | asset_url | stylesheet_tag }}
+{% capture header_url %}
+  {{ 'header.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: header_url, priority: 'normal', type: "defer" %}
+{{ 'header.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.menu.links == blank -%}
+  {%- assign main_menu_linklist = linklists[section.settings.menu].links -%}
+{%- else -%}
+  {%- assign main_menu_linklist = section.settings.menu.links -%}
+{%- endif -%}
+<sticky-header
+  id="header"
+  class="transition-all bg-white w-full z-10 -translate-y-full"
+  x-data="{ mobileMenuOpen: false }">
+  <div class="relative z-20 mx-auto">
+    <div class="sticky-active flex px-3.5 mx-auto xl:px-20 items-center border-b border-border-default xl:border-none justify-between relative min-h-14 xl:min-h-18">
+      {%- comment -%}🍔 MENU{%- endcomment -%}
+      <div class="xl:hidden flex items-center pr-4 w-1/4">
+        <button
+          id="open-menu-mobile"
+          class="open-menu-mobile inline-flex items-center justified-center focus:outline-none p-0 text-grey-900 hover:text-grey-700 border-none shadow-none !bg-transparent mr-4"
+          type="button"
+          x-on:click="mobileMenuOpen = true">
+          {% render 'icon-menu' %}
+        </button>
+        {% if shop.customer_accounts_enabled %}
+          <a class="inline-block text-headerLink hover:text-grey-700 text-base text-grey-900 xl:hidden {% if customer %}text-secondary{% endif %}" href="{{ routes.account_url }}">{% render 'icon-account' %}</a>
+        {% endif %}
+      </div>
+
+      {%- comment -%}STORE NAME | STORE LOGO{%- endcomment -%}
+
+      <div class="flex justify-center xl:justify-start truncate !ml-0 w-1/2 xl:w-auto">
+        {%- assign image_mobile_size = settings.header_logo_max_width_mobile -%}
+        {%- assign image_size = settings.header_logo_max_width -%}
+        {%- if settings.header_logo_mobile != blank -%}
+          <a
+            href="{{ shop.url }}"
+            title="{{ shop.name }}"
+            class="my-2 w-full flex xl:hidden"
+            style="max-width: {{ image_mobile_size }}px">
+            <img
+              srcset="{{ settings.header_logo_mobile | image_url: width: settings.header_logo_mobile.width }}"
+              src="{{ settings.header_logo_mobile | image_url: width: settings.header_logo_mobile.width }}"
+              loading="lazy"
+              width="{{ settings.header_logo_mobile.width }}"
+              height="{{ settings.header_logo_mobile.height }}"
+              alt="{{ settings.header_logo_mobile.alt | default: shop.name | escape }}">
+          </a>
+        {%- else -%}
+          <a
+            href="{{ shop.url }}"
+            title="{{ shop.name }}"
+            class="my-2 w-full flex xl:hidden"
+            style="max-width: {{ image_mobile_size }}px">
+            {%- render 'logo-mobile', class: 'w-full h-full' -%}
+          </a>
+        {%- endif -%}
+        {% if settings.header_logo %}
+          <a
+            href="{{ shop.url }}"
+            title="{{ shop.name }}"
+            class="my-2 w-full hidden xl:flex"
+            style="max-width: {{ image_size }}px">
+            <img
+              srcset="{{ settings.header_logo | image_url: width: settings.header_logo.width }}"
+              src="{{ settings.header_logo | image_url: width: settings.header_logo.width }}"
+              loading="lazy"
+              width="{{ settings.header_logo.width }}"
+              height="{{ settings.header_logo.height }}"
+              alt="{{ settings.header_logo.alt | default: shop.name | escape }}">
+          </a>
+        {% else %}
+          <a
+            href="{{ shop.url }}"
+            title="{{ shop.name }}"
+            class="my-2 w-full hidden xl:flex"
+            style="max-width: {{ image_size }}px">
+            {%- render 'logo-desktop', class: 'w-full h-full' -%}
+          </a>
+        {% endif %}
+      </div>
+
+      {%- comment -%}NAVIGATION MENU{%- endcomment -%}
+      <nav class="top-megamenu xl:w-2/4 xl:-ml-18.5" role="navigation">
+        {% include 'mega-menu', blocks: section.blocks, section_settings: section.settings %}
+      </nav>
+
+      {%- comment -%}CART BUTTON | ACCOUNT LINKS{%- endcomment -%}
+      <div class="items-center flex justify-end w-1/4 xl:w-auto xl:max-w-1/4">
+        <button id="btn-search-desktop" class="hidden w-5 h-5 xl:w-6 xl:h-6 xl:left-auto xl:right-0 xl:block shadow-none border-none !p-0 !bg-transparent !text-grey-900 hover:!text-grey-700" type="button">
+          {%- render 'icon-search' -%}
+        </button>
+        <a class="relative hidden xl:inline-block text-headerLink hover:text-grey-700 text-base text-grey-900 ml-4 xl:ml-5" href="/pages/store-locator">
+          {%- render 'icon-map-pin' -%}
+        </a>
+        {%- if shop.customer_accounts_enabled -%}
+          <a class="hidden xl:inline-block text-headerLink hover:text-grey-700 text-base text-grey-900 ml-4 xl:ml-5 {% if customer %}text-secondary{% endif %}" href="{{ routes.account_url }}">{% render 'icon-account' %}</a>
+        {%- endif -%}
+        <a class="relative inline-block text-headerLink hover:text-grey-700 text-base text-grey-900 ml-4 xl:ml-5" href="/pages/swym-wishlist">
+          {%- render 'icon-heart' -%}
+        </a>
+        <p id="header__icon--cart" class="cursor-pointer relative inline-block text-headerLink hover:text-grey-700 text-base text-grey-900 ml-4 xl:ml-5 mb-0">
+          {%- render 'icon-bag' -%}
+          <span class="min-w-6 h-6 bg-secondary text-white flex items-center justify-center rounded-full text-sm absolute top-1/2 right-0.75 xl:top-1/4 xl:right-0 translate-x-1/2 -translate-y-1/2 font-bold font-sans {% if cart.item_count == 0 %}hidden{% endif %}" id="minicart-count">
+            {{ cart.item_count }}
+          </span>
+        </p>
+      </div>
+    </div>
+    <div id="searchspring-search-input" class="w-full h-12 xl:h-full xl:absolute xl:top-0 xl:left-0 xl:w-full xl:-translate-y-full xl:opacity-0 xl:invisible transition-all duration-300 relative">
+
+    </div>
+  </div>
+</sticky-header>
+{% capture minicart_url %}{{ 'minicart.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: minicart_url, priority: 'normal', type: "defer" %}
+{{ 'minicart.css' | asset_url | stylesheet_tag }}
+{% capture src_searchspring %}{{ 'searchspring-ui.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_searchspring, priority: 'important' %}
+{% schema %}
+  {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "text",
+        "id": "mobile_menu_title",
+        "label": "Mobile Menu Title",
+        "default": "Menu"
+      }, {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Header Navigation Menu",
+        "default": "main-menu"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "main-item",
+        "name": "Main menu item",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "URL"
+          },
+          {
+            "type": "text",
+            "id": "background_color_menu_mobile",
+            "label": "Background color menu mobile"
+          },
+          {
+            "type": "image_picker",
+            "id": "background_image_menu_mobile",
+            "label": "Background image menu mobile"
+          },
+          {
+            "type": "checkbox",
+            "id": "menu_sale",
+            "label": "Sale",
+            "default": false
+          }, {
+            "type": "number",
+            "id": "items_first_column",
+            "label": "Items in first column",
+            "default": 1
+          }, {
+            "type": "number",
+            "id": "items_two_column",
+            "label": "Items in two column",
+            "default": 1
+          }, {
+            "type": "number",
+            "id": "items_three_column",
+            "label": "Items in three column",
+            "default": 1
+          }, {
+            "type": "number",
+            "id": "items_four_column",
+            "label": "Items in four column",
+            "default": 1
+          }, {
+            "type": "header",
+            "content": "For Columns"
+          }, {
+            "type": "link_list",
+            "id": "column_1",
+            "label": "Column menu dropdown",
+            "info": "Choose navigation menu for item"
+          }, {
+            "type": "image_picker",
+            "id": "promo_image_banner",
+            "label": "Promo menu banner"
+          }, 
+          {
+            "type": "image_picker",
+            "id": "promo_image_banner_mobile",
+            "label": "Promo menu banner (mobile)"
+          }, 
+          {
+            "type": "url",
+            "id": "menu_promo_banner_url",
+            "label": "Promo menu banner URL"
+          }
+        ]
+      }, {
+        "type": "brand-item",
+        "name": "Brand image",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "URL"
+          },
+          {
+            "type": "text",
+            "id": "background_color_menu_mobile",
+            "label": "Background color menu mobile"
+          },
+          {
+            "type": "image_picker",
+            "id": "background_image_menu_mobile",
+            "label": "Background menu mobile"
+          },
+          {
+            "type": "header",
+            "content": "For Columns"
+          }, {
+            "type": "link_list",
+            "id": "column_1",
+            "label": "Column menu dropdown",
+            "info": "Choose navigation menu for item"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_1",
+            "label": "Image brand 1"
+          }, {
+            "type": "url",
+            "id": "brand_link_1",
+            "label": "Url brand 1"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_2",
+            "label": "Image brand 2"
+          }, {
+            "type": "url",
+            "id": "brand_link_2",
+            "label": "Url brand 2"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_3",
+            "label": "Image brand 3"
+          }, {
+            "type": "url",
+            "id": "brand_link_3",
+            "label": "Url brand 3"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_4",
+            "label": "Image brand 4"
+          }, {
+            "type": "url",
+            "id": "brand_link_4",
+            "label": "Url brand 4"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_5",
+            "label": "Image brand 5"
+          }, {
+            "type": "url",
+            "id": "brand_link_5",
+            "label": "Url brand 5"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_6",
+            "label": "Image brand 6"
+          }, {
+            "type": "url",
+            "id": "brand_link_6",
+            "label": "Url brand 6"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_7",
+            "label": "Image brand 7"
+          }, {
+            "type": "url",
+            "id": "brand_link_7",
+            "label": "Url brand 7"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_8",
+            "label": "Image brand 8"
+          }, {
+            "type": "url",
+            "id": "brand_link_8",
+            "label": "Url brand 8"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_9",
+            "label": "Image brand 9"
+          }, {
+            "type": "url",
+            "id": "brand_link_9",
+            "label": "Url brand 9"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_10",
+            "label": "Image brand 10"
+          }, {
+            "type": "url",
+            "id": "brand_link_10",
+            "label": "Url brand 10"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_11",
+            "label": "Image brand 11"
+          }, {
+            "type": "url",
+            "id": "brand_link_11",
+            "label": "Url brand 11"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_12",
+            "label": "Image brand 12"
+          }, {
+            "type": "url",
+            "id": "brand_link_12",
+            "label": "Url brand 12"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_13",
+            "label": "Image brand 13"
+          }, {
+            "type": "url",
+            "id": "brand_link_13",
+            "label": "Url brand 13"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_14",
+            "label": "Image brand 14"
+          }, {
+            "type": "url",
+            "id": "brand_link_14",
+            "label": "Url brand 14"
+          }, {
+            "type": "image_picker",
+            "id": "brand_image_15",
+            "label": "Image brand 15"
+          }, {
+            "type": "url",
+            "id": "brand_link_15",
+            "label": "Url brand 15"
+          }
+        ]
+      }, {
+        "type": "mobile-item",
+        "name": "Mobile menu item",
+        "settings": [
+          {
+            "type": "header",
+            "content": "For mobile menu quick links"
+          },
+          {
+            "type": "text",
+            "id": "title_1",
+            "label": "Title for link 1"
+          },
+          {
+            "type": "url",
+            "id": "url_1",
+            "label": "URL for link 1"
+          },
+          {
+            "type": "image_picker",
+            "id": "image_1",
+            "label": "Image for link 1"
+          },
+          {
+            "type": "text",
+            "id": "title_2",
+            "label": "Title for link 2"
+          }, 
+          {
+            "type": "url",
+            "id": "url_2",
+            "label": "URL for link 2"
+          }, 
+          {
+            "type": "image_picker",
+            "id": "image_2",
+            "label": "Image for link 2"
+          },
+          {
+            "type": "text",
+            "id": "title_3",
+            "label": "Title for link 3"
+          }, {
+            "type": "url",
+            "id": "url_3",
+            "label": "URL for link 3"
+          },
+          {
+            "type": "image_picker",
+            "id": "image_3",
+            "label": "Image for link 3"
+          }
+        ]
+      },
+      {
+        "type": "icon_image",
+        "name": "Menu image",
+        "settings": [
+         {
+            "type": "text",
+            "id": "handle",
+            "label": "Handle"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

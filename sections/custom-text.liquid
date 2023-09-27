@@ -1,0 +1,159 @@
+<script>
+  window.customText = window.customText || false;
+</script>
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {% if section.settings.background %}
+      background-color: {{ section.settings.background }};
+    {% endif %}
+    padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+    padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+  }
+  @media (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+    }
+  }
+  @media (min-width: 1024px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+    }
+  }
+</style>
+{% if section.settings.description != blank %}
+  <div class="{% if section.settings.border_bottom %}border-b border-border-default{% endif %} px-4 xl:px-20 section-custom-text {{ section.settings.text_alignment }}" data-section-id="{{ section.id }}">
+    {% if section.settings.heading != blank %}
+      <h3 class="text-xl md:text-2xl text-grey-900 font-bold mb-1 md:mb-2">{{ section.settings.heading }}</h3>
+    {% endif %}
+      <div class="custom-text-home text-grey-700">
+        <div class="js-read-more inline [&>*]:text-lg [&>p]:inline [&>p>a]:text-lg" data-rm-words="40">
+          <p class="text_more text-lg font-normal text-grey-700 inline">
+            {{ section.settings.description }}
+          </p>
+        </div>
+      </div>
+  </div>
+  {% capture src_url %}{{ 'template-collection.js' | asset_url }}{% endcapture %}
+  {% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+  {{ 'custom-text.css' | asset_url | stylesheet_tag }}
+{% endif %}
+{% schema %}
+  {
+    "name": "Custom text",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "border_bottom",
+        "label": "Enable border bottom"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      },
+      {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Text alignment",
+        "default": "text-left",
+        "options": [
+          {
+            "value": "text-left",
+            "label": "Text left"
+          },
+          {
+            "value": "text-center",
+            "label": "Text center"
+          },
+          {
+            "value": "text-right",
+            "label": "Text right"
+          }
+        ]
+      },
+      {
+        "type": "color",
+        "id": "background",
+        "label": "Background color"
+      },
+      {
+        "type": "header",
+        "content": "Desktop"
+      },
+      {
+        "type": "range",
+        "id": "pd_top_dt",
+        "label": "Padding top",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 72
+      },
+      {
+        "type": "range",
+        "id": "pd_bottom_dt",
+        "label": "Padding bottom",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 72
+      },
+      {
+        "type": "header",
+        "content": "Tablet"
+      },
+      {
+        "type": "range",
+        "id": "pd_top_tl",
+        "label": "Padding top",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 36
+      },
+      {
+        "type": "range",
+        "id": "pd_bottom_tl",
+        "label": "Padding bottom",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 36
+      },
+      {
+        "type": "header",
+        "content": "Mobile"
+      },
+      {
+        "type": "range",
+        "id": "pd_top_mb",
+        "label": "Padding top",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 32
+      },
+      {
+        "type": "range",
+        "id": "pd_bottom_mb",
+        "label": "Padding bottom",
+        "max": 100,
+        "min": 0,
+        "step": 2,
+        "default": 32
+      }
+    ],
+    "presets": [
+      {
+        "name": "Custom text"
+      }
+    ]
+  }
+  {% endschema %}

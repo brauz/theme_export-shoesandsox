@@ -1,0 +1,178 @@
+<div class="block-measure mt-6">
+    <h4 class="text-grey-900 text-lg leading-6 font-bold m-0 p-0 mb-4">{{ section.settings.measure_title }}</h4>
+    <div class="image-text">
+        <p class="text-grey-700 font-normal text-sm leading-[22px] m-0 p-0">{{ section.settings.measure_desc }}</p>
+        <div class="flex gap-x-6 mt-4">
+            <img src="{{ section.settings.measure_image | image_url: width: section.settings.measure_image.width }}" loading="lazy" width="{{ section.settings.measure_image.width }}" height="{{ section.settings.measure_image.height }}"  alt="{{ section.settings.measure_image.alt }}" class="block w-full h-full object-center object-cover max-w-full transition-all duration-400">
+            {{ section.settings.measure_img_desc }}
+        </div>
+    </div>
+</div>
+
+<div class="accessories mt-12">
+    {% if section.settings.accessories_title != blank %}
+        <h4 class="text-grey-900 font-bold text-lg leading-6 m-0 p-0 mb-4">{{ section.settings.accessories_title }}</h4>
+    {% endif %}
+    
+    <div class="flex gap-x-4 md:gap-x-6">
+        <div class="block h-full">
+            {% if section.settings.accessories_image_1 %}
+                <img src="{{ section.settings.accessories_image_1 | image_url: width: section.settings.accessories_image_1.width }}" loading="lazy" width="{{ section.settings.accessories_image_1.width }}" height="{{ section.settings.accessories_image_1.height }}"  alt="{{ section.settings.accessories_image_1.alt }}" class="block w-full h-full object-center object-cover max-w-full transition-all duration-400 rounded-sm">
+            {% endif %}
+            {% if section.settings.accessories_title_1 != blank %}
+                <a href="{{ section.settings.accessories_url_1 }}" class="block w-full text-grey-900 font-bold text-base md:text-lg leading-6 m-0 p-0 my-4 no-underline">{{ section.settings.accessories_title_1 }}</a>
+            {% endif %}
+            
+            <a href="{{ section.settings.accessories_url_1 }}" class="text-grey-900 text-sm md:text-base font-bold leading-[22px] m-0 p-0 decoration-[#ECC242] decoration-2 underline-offset-[6px] hover:text-grey-900 hover:decoration-[#1F1F1F]">Shop Now</a>
+        </div>
+
+        <div class="block h-full">
+            {% if section.settings.accessories_image_2 %}
+                <img src="{{ section.settings.accessories_image_2 | image_url: width: section.settings.accessories_image_2.width }}" loading="lazy" width="{{ section.settings.accessories_image_2.width }}" height="{{ section.settings.accessories_image_2.height }}"  alt="{{ section.settings.accessories_image_2.alt }}" class="block w-full h-full object-center object-cover max-w-full transition-all duration-400 rounded-sm">
+            {% endif %}
+            {% if section.settings.accessories_title_2 != blank %}
+                <a href="{{ section.settings.accessories_url_2 }}" class="block w-full text-grey-900 font-bold text-base md:text-lg leading-6 m-0 p-0 my-4 no-underline">{{ section.settings.accessories_title_2 }}</a>
+            {% endif %}
+            <a href="{{ section.settings.accessories_url_2 }}" class="text-grey-900 text-sm md:text-base font-bold leading-[22px] m-0 p-0 decoration-[#ECC242] decoration-2 underline-offset-[6px] hover:text-grey-900 hover:decoration-[#1F1F1F]">Shop Now</a>
+        </div>
+    </div>
+</div>
+
+{% if section.settings.book_title != blank %}
+    <div class="book-a-digital-fitting rounded-sm bg-[#E5AEA3] h-[180px] md:h-[216px] flex flex-wrap items-center justify-center flex-col mt-12 px-[42px] md:px-[70px]">
+        <h3 class="text-white font-bold text-xl md:text-2xl leading-8 m-0 p-0 mb-4 md:mb-6 w-full text-center">{{ section.settings.book_title }}</h3>
+        <a href="{{ section.settings.book_url }}" class="btn btn-primary show-shadow no-underline !bg-[#E5AEA3] !border-white !text-white !shadow-[#FFFFFF] w-[209px] h-12">{{ section.settings.book_url_text }}</a>
+    </div>
+{% endif %}
+
+{% if section.settings.contact_title != blank %}
+    <div class="contact-customer-support rounded-sm bg-[#ECC242] h-[180px] md:h-[216px] flex flex-wrap items-center justify-center flex-col mt-4 md:mt-6 px-[42px] md:px-[70px]">
+        <h3 class="text-white font-bold text-xl md:text-2xl leading-8 m-0 p-0 mb-4 md:mb-6 w-full text-center">{{ section.settings.contact_title }}</h3>
+        <a href="{{ section.settings.contact_url }}" class="btn btn-primary show-shadow no-underline !bg-[#ECC242] !border-white !text-white !shadow-[#FFFFFF] w-[209px] h-12">{{ section.settings.contact_url_text }}</a>
+    </div>
+{% endif %}
+
+{% capture src_url %}{{ 'template-size-chart.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-size-chart.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+    {
+        "name": "Size chart section",
+        "settings": [
+            {
+                "type": "header",
+                "content": "Setting Measure"
+            },
+            {
+                "type": "text",
+                "id": "measure_title",
+                "label": "Measure Title",
+                "default": "How to measure your child’s foot"
+            },
+            {
+                "type": "text",
+                "id": "measure_desc",
+                "label": "Measure Description"
+            },
+            {
+                "type": "image_picker",
+                "id": "measure_image",
+                "label": "Measure Image"
+            },
+            {
+                "type": "richtext",
+                "id": "measure_img_desc",
+                "label": "Measure Imgage Desc",
+                "default": "<p></p>"
+            },
+            {
+                "type": "header",
+                "content": "Settings Accessories"
+            },
+            {
+                "type": "text",
+                "id": "accessories_title",
+                "label": "Accessories Title"
+            },
+            {
+                "type": "image_picker",
+                "id": "accessories_image_1",
+                "label": "Accessories Image 1"
+            },
+            {
+                "type": "text",
+                "id": "accessories_title_1",
+                "label": "Accessories Title 1"
+            },
+            {
+                "type": "url",
+                "id": "accessories_url_1",
+                "label": "Accessories Link 1"
+            },
+            {
+                "type": "image_picker",
+                "id": "accessories_image_2",
+                "label": "Accessories Image 2"
+            },
+            {
+                "type": "text",
+                "id": "accessories_title_2",
+                "label": "Accessories Title 2"
+            },
+            {
+                "type": "url",
+                "id": "accessories_url_2",
+                "label": "Accessories Link 2"
+            },
+            {
+                "type": "header",
+                "content": "Settings Book A Digital"
+            },
+            {
+                "type": "text",
+                "id": "book_title",
+                "label": "Book Title",
+                "default": "Still unsure? Book a Digital Fitting"
+            },
+            {
+                "type": "text",
+                "id": "book_url_text",
+                "label": "Book Url Text",
+                "default": "Book a Digital Fitting"
+            },
+            {
+                "type": "url",
+                "id": "book_url",
+                "label": "Book Url"
+            },
+            {
+                "type": "header",
+                "content": "Settings Contact Support Customer"
+            },
+            {
+                "type": "text",
+                "id": "contact_title",
+                "label": "Contact Customer Support Title",
+                "default": "Have a question? Contact Customer Support"
+            },
+            {
+                "type": "text",
+                "id": "contact_url_text",
+                "label": "Contact Support Title",
+                "default": "Contact Support"
+            },
+            {
+                "type": "url",
+                "id": "contact_url",
+                "label": "Contact Url"
+            }
+        ],
+        "presets": [
+            {
+                "name": "Size Chart Section"
+            }
+        ]
+    }
+{% endschema %}

@@ -1,0 +1,18 @@
+<div id="form-quick-view" class="form-quick-view transition-all duration-500 fixed md:top-1/2 md:left-1/2 -bottom-full md:bottom-0 md:translate-y-minus-top-50 md:translate-x-minus-top-50 bg-white w-full md:max-w-x534 max-h-full-103 md:max-h-full-54 rounded-t-lg md:rounded-t-sm md:rounded-sm overflow-x-hidden z-x999 overflow-y-auto h-fit md:hidden invisible">
+</div>
+<div class="quick-view-overlay bg-overlay hidden fixed w-full top-0 left-0 right-0 bottom-0 min-h-screen z-50"></div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function (event) {
+        (function closeOverlay() {
+            const overlay = document.querySelector('.quick-view-overlay');
+            overlay.addEventListener('click', function () {
+                const containerEl = document.getElementById('form-quick-view');
+                if (containerEl) {
+                    containerEl.classList.remove('active', 'open-size');
+                    document.body.classList.remove('active-quick-view');
+                }
+            });
+        })();
+    });
+</script>

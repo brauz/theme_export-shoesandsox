@@ -1,0 +1,192 @@
+{% capture src_url %}{{ 'announcement-bar.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{{ 'announcement-bar.css' | asset_url | stylesheet_tag }}
+
+{% if section.settings.enable_announcement_404 == true and request.page_type == '404' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_article == true and request.page_type == 'article' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_blog == true and request.page_type == 'blog' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_cart == true and request.page_type == 'cart' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_list_collections == true and request.page_type == 'list-collections' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_collection == true and request.page_type == 'collection' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_product == true and request.page_type == 'product' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_index == true and request.page_type == 'index' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_cms_page == true and request.page_type == 'page' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+{% if section.settings.enable_announcement_account == true and request.page_type contains 'customers' %}
+  {% render 'announcement-bar-block', section: section %}
+{% endif %}
+
+<script>
+    window.PR_RENDER_LIST = window.PR_RENDER_LIST || [];
+    {% for block in section.blocks %}
+        var object = {
+            link: {{ block.settings.link | json }},
+            heading: {{ block.settings.text | json }},
+        }
+        window.PR_RENDER_LIST.push(object);
+    {% endfor %}
+</script>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_slider",
+      "label": "Enable slider",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brauz",
+      "label": "Show Brauz snippet",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_404",
+      "label": "Enable Page 404",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_article",
+      "label": "Enable Blog Post",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_blog",
+      "label": "Enable Blog Page",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_cart",
+      "label": "Enable Page Cart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_list_collections",
+      "label": "Enable List Collection",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_collection",
+      "label": "Enable Collection Page",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_product",
+      "label": "Enable Product Page",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_index",
+      "label": "Enable HomePage",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_cms_page",
+      "label": "Enable Page CMS",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_announcement_account",
+      "label": "Enable Page Account",
+      "default": true
+    },
+   
+    {
+      "type": "text",
+      "id": "custom-right",
+      "label": "Text right side"
+    },
+    {
+      "type": "url",
+      "id": "custom-right-url",
+      "label": "Text right url"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement bar",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Welcome to our store",
+          "label": "Announcement label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Announcement link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_announcement_new_window",
+          "label": "Open link in new tab",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "announcement"
+      }
+    ]
+  }
+}
+{% endschema %}

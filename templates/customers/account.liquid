@@ -1,0 +1,121 @@
+{% render 'breadcrumb' %}
+
+{% assign bg_color = settings.ac_bg_color %}
+<div class="account-content-top">
+    <div class="md:max-w-x1312 px-4 mx-auto md:border-b-0 border-b border-solid border-border-default">
+        {% render 'account-menu', title: 'Order History', title_mobile: 'My Orders' %}
+    </div>
+</div>
+<style>
+    @media (min-width: 768px) {
+        .account-content-top {
+            background-color: {{ bg_color }};
+        }
+    } 
+</style>
+
+<div class="md:max-w-x1312 mx-auto md:pt-12 md:pb-14 pt-6 pb-8 dd:px-4 px-0">
+    <div class="dd:flex block">
+        <div class="dd:w-x291 w-full dd:p-0 px-4 dd:border-b-0 border-b border-border-default">
+            <div class="block sidebar_left">
+                <div class="w-full dd:mb-8 mb-6">
+                    <h2 class="dd:text-xl text-lg font-bold text-grey-900 mb-3">Account Details</h2>
+                    {{ customer.default_address | format_address }}
+                    <a href="{{ routes.account_addresses_url }}" class="text-sm text-grey-700 hover:text-accent-1">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }}) </a>
+                </div>
+                {% if settings.enable_brauz == true %}
+                    <div
+                    id="brauz-find-in-store-config-account-page"
+                    data-sd="{{ shop.permanent_domain }}"
+                    data-ca="{{ customer.default_address | format_address }}"
+                    style="display: none; width: 0"
+                    ></div>
+                    <div id="brauz-find-in-store-account-page"></div>
+                {% endif %}
+                {%- if settings.enable_store -%}
+                    <div class="block_store dd:pt-8 pt-6 dd:pb-0 pb-6 border-t border-solid border-default">
+                        {%- if settings.ac_heading != blank -%}
+                            <h2 class="dd:text-xl text-lg font-bold text-grey-900 mb-3">{{ settings.ac_heading }}</h2>
+                        {%- endif -%}
+                        {%- if settings.ac_subheading != blank -%}
+                            <p class="font-bold text-sm !text-grey-900">{{ settings.ac_subheading }}</p>
+                        {%- endif -%}
+                        {%- if settings.ac_text_link != blank -%}
+                            <a href="{{ settings.ac_link }}" class="pb-3 block text-grey-500 hover:text-accent-1 underline">{{ settings.ac_text_link }}</a>
+                        {%- endif -%}
+                        {%- if settings.ac_content != blank -%}
+                            <p class="mb-0">{{ settings.ac_content }}</p>
+                        {%- endif -%}
+                    </div>
+                {%- endif -%}
+            </div>
+        </div>
+        <div class="w-full account-content dd:w-full-x291 dd:pl-x105 pl-0">
+            <div class="w-full mb-6 dd:block hidden">
+                <h5 class="text-xl font-bold text-grey-900 mb-0">Order History</h5>
+            </div>
+            {%- assign number_of_orders = customer.orders | size -%}
+            {%- if number_of_orders > 0 -%}
+                <table class="w-full" cellpadding="0" cellspacing="0" border="0">
+                    <thead class="dd:table-header-group dd:block hidden">
+                        <tr class="w-full">
+                            <th class="text-left border-b border-border-default pb-2 pr-2 text-grey-900 font-bold text-sm pt-0">Order</th>
+                            <th class="text-left border-b border-border-default pb-2 pr-2 text-grey-900 font-bold text-sm pt-0">Date</th>
+                            <th class="text-left border-b border-border-default pb-2 pr-2 text-grey-900 font-bold text-sm pt-0">Payment status</th>
+                            <th class="text-left border-b border-border-default pb-2 pr-2 text-grey-900 font-bold text-sm pt-0">Fulfillment status</th>
+                            <th class="text-left border-b border-border-default pb-2 pr-2 text-grey-900 font-bold text-sm pt-0">Tracking</th>
+                            <th class="text-right border-b border-border-default pb-2 pl-2 text-grey-900 font-bold text-sm pt-0">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {%- paginate customer.orders by 4 -%}
+                        {%- for order in customer.orders -%}
+                        <tr class="dd:border-b border-border-default dd:table-row block dd:p-0 pb-2 dd:bg-transparent bg-grey-100">
+                            <td data-th="Order" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 pb-1 pt-6 dd:px-0 px-4 bg-white text-left border-b-0 dd:border-b border-border-default text-grey-700 before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 dd:before:hidden before:w-1/2">
+                                <a class="text-grey-700 font-normal underline text-sm" href="{{ order.customer_url }}">{{ order.name }}</a>
+                            </td>
+                            <td data-th="Date" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 py-1 dd:px-0 px-4 bg-white text-left border-b-0 dd:border-b border-border-default text-grey-700 before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 text-sm dd:before:hidden before:w-1/2">{{ order.created_at | date: "%b %d, %Y" }}</td>
+
+                            <td data-th="Payment status" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 py-1 dd:px-0 px-4 bg-white text-sm text-grey-700 font-normal before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 dd:table-cell dd:before:hidden before:w-1/2">{{ order.financial_status_label }}</td>
+
+                            <td data-th="Fulfillment status" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 py-1 dd:px-0 px-4 bg-white text-sm text-grey-700 font-normal before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 dd:table-cell dd:before:hidden before:w-1/2">{{ order.fulfillment_status_label }}</td>
+
+                            <td data-th="Tracking" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 py-1 dd:px-0 px-4 bg-white before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 dd:table-cell dd:before:hidden before:w-1/2 ">
+                            {%- if order.fulfilled_line_items[0].fulfillment.tracking_url -%}
+                                <a href="{{ order.fulfilled_line_items[0].fulfillment.tracking_url }}" target="_blank"><span class="underline">{{ order.fulfilled_line_items[0].fulfillment.tracking_number }}</span></a>
+                            {%- else -%}
+                                <span class="underline text-sm text-grey-700 font-normal cursor-pointer">No Tracking</span>
+                            {%- endif -%}
+                            </td>
+
+                            <td data-th="Total" class="dd:table-cell block dd:w-auto w-full leading-x22 dd:py-4 pt-1 pb-6 dd:px-0 px-4 bg-white dd:text-right text-sm text-grey-700 font-normal before:content-[attr(data-th)] before:inline-block before:text-sm before:font-bold before:text-grey-900 dd:table-cell dd:before:hidden before:w-1/2 dd:border-b-0 border-b border-border-default">{{ order.total_price | money }}</td>
+                        </tr>
+                        {%- endfor -%}
+                    </tbody>
+                </table>
+                {%- if paginate.pages > 1 -%}
+                    <nav class="flex justify-center navigation_paginate">
+                        <a href="{{ paginate.previous.url }}" class="items flex items-center justify-center text-base font-normal hover:bg-secondary-focus hover:bg-primary hover:text-white {% unless paginate.previous %} hover:text-grey-900 hover:bg-transparent hover:font-normal cursor-default pointer-events-none {% endunless %}no-underline p-0 py-1.75 min-w-10 h-10 font-normal text-grey-900 rounded-l">
+                            <span class="flex justify-center items-center min-w-4.5 text-center h-full">{% render 'ChevronLeft' %}</span>
+                        </a>
+                        {%- for part in paginate.parts -%}
+                            {%- if part.is_link -%}
+                                <a href="{{ part.url }}" class="items flex items-center justify-center text-base font-normal no-underline px-2.5 py-1.75 min-w-10 h-10 font-normal text-grey-700 hover:bg-secondary-focus hover:font-bold hover:text-white hover:bg-primary"><span class="inline-block min-w-4.5 text-center">{{ part.title }}</span></a>
+                            {%- else -%}
+                                <span class="items flex items-center justify-center text-base font-bold no-underline px-2.5 py-1.75 min-w-10 h-10 bg-primary text-white bg-secondary-focus hover:text-white"><span class="inline-block min-w-4.5 text-center">{{ part.title }}</span></span>
+                            {%- endif -%}
+                        {%- endfor -%}
+                        <a href="{{ paginate.next.url }}" class="items flex items-center justify-center text-base font-normal hover:bg-secondary-focus hover:bg-primary hover:text-white {% unless paginate.next %}hover:text-grey-900 hover:bg-transparent hover:font-normal cursor-default pointer-events-none {% endunless %} no-underline p-0 py-1.75 min-w-10 h-10 font-normal text-grey-900 rounded-r">
+                            <span class="flex justify-center items-center min-w-4.5 text-center h-full">{% render 'ChevronRight' %}</span>
+                        </a>
+                    </nav>
+                {%- endif -%}
+            {%- endpaginate -%}
+            {%- else -%}
+                <div class="flex items-center w-full pt-4 dd:pt-0">
+                    <h2 class="text-base font-medium text-grey-900 m-0 text-left">You have no orders yet.</h2>
+                </div>
+            {%- endif -%}
+        </div>
+    </div>
+</div> 

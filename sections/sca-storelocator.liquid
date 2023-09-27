@@ -1,0 +1,322 @@
+{% capture src_url %}{{ 'sca-storelocator.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'sca-storelocator.css' | asset_url | stylesheet_tag }}
+
+<div id='scasl-app-container' class="pt-3 md:pt-4 mx-auto md:max-w-x1312" style="display:none">
+    <div class="page-width">
+        <div class="bh-sl-container scasl-container">
+            {% unless template == 'index' or template == 'cart' or template == 'account' or template == 'addresses'  or template == 'order' %}{% endunless %}
+            <ul class="flex pb-3 md:pb-4 items-center" id="breadcrumbs">
+                <li>
+                    <a href="/" title="{{ 'general.breadcrumbs.home' | t }}">{{ 'general.breadcrumbs.home' | t }}</a>  {% render 'icon_breadcrumb' %}
+                </li>
+                {% if template contains 'page' %}
+                    <li><span>{{ page.title }}</span></li>
+                {% elsif template contains 'account' %}
+                    <li><span>Account</span></li>
+                {% elsif template contains 'addresses' %}
+                    <li><span>Addresses</span></li>
+                {% elsif template contains 'order' %}
+                    <li><span>Order</span></li>
+                {% endif %}
+            </ul>
+            <div class="store-header flex justify-center md:mt-8 md:justify-between items-end flex-wrap lg:flex-nowrap relative">
+                <div id="page-header" class="pr-0 lg:pr-4 mb-4 lg:mb-0 text-center lg:text-left w-full max-w-full">
+                <h1 class="bh-sl-title">Store Locator</h1>
+                <p class="bh-sl-description m-0 text-grey-700 max-w-x304 lg:max-w-full mx-auto text-center lg:text-left">Use the fields to search for your nearest store.</p>
+                </div>
+                <div class="bh-sl-form-container lg:absolute top-0 right-0">
+                    <div class="">
+                        <form id="bh-sl-user-location" class="scasl-distance flex items-center flex-wrap lg:flex-nowrap" method="post" action="#">
+                            <div class="flex w-full lg:w-auto">
+                                <div class="border-0 mr-4 lg:mr-5 w-full lg:w-auto">
+                                    {%- comment -%} <label for="bh-sl-address">Current Location</label> {% endcomment %}
+                                    <div class="scasl-address-wrap field__input">
+                                        <input type="text" id="bh-sl-address" name="bh-sl-address" placeholder="Address or postcode" />
+                                        <label for="bh-sl-address" class="">Address or postcode</label>
+                                        <a href="#" id="scapl-geocode-btn" title="Find My Location" style="background-color: none !important"></a>
+                                        {%- comment -%}<button id="scapl-geocode-btn" type="button">Find My Location</button>{%- endcomment -%}   
+                                    </div>
+                                </div>
+
+                                <div class="scasl-see-more-content mr-0 lg:mr-5">
+                                    <div class="flex items-center justify-center">
+                                        <label for="scasl-radius-container" class="font-bold text-base text-grey-900 mr-3 hidden lg:block">Distance</label>
+                                        <select id="scasl-radius-container" name="bh-sl-maxdistance" class="bh-sl-maxdistance w-x120 md:w-x130">
+                                            <option class="hidden" value=""></option>
+                                        </select>
+                                    </div>
+
+                                    <div class="hidden">
+                                        <label for="scasl-lengthUnit">Search Radius Measurement</label>
+                                        <select id="scasl-lengthUnit" name="scasl-lengthUnit">
+                                            <option value="m">Mile</option>
+                                            <option value="km">Kilometer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="scasl-search-btn w-full lg:w-auto mt-4 lg:mt-0 hidden lg:block">
+                                <button id="bh-sl-submit" class="btn btn-primary show-shadow no-underline" type="submit">Search</button>
+                            </div>
+                        </form>
+                        <div class="spinner">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div >
+
+            <div class="bh-sl-filters-container scasl-tag">
+                <ul id="scasl-tag-list-container" class="bh-sl-filters scasl-tag-list"></ul>
+            </div>
+
+            <div class="scasl-search-btn w-full lg:w-auto lg:mt-0 lg:hidden">
+                <button id="bh-sl-submit-mobile" class="btn btn-primary show-shadow no-underline !mt-4" type="submit">Search</button>
+            </div>
+
+            <div id="bh-sl-map-container" class="bh-sl-map-container scasl-map-container">
+                <div class="bh-sl-loc-list scasl-location-list order-1 lg:order-none">
+                    <ul class="list"></ul>
+                </div>
+                <div id="bh-sl-map" class="bh-sl-map scasl-map order-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<br style="clear:both !important;" />
+<script src="//cdn.secomapp.com/storelocator/assets/cdn/js/infobubble.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script>
+    if ("undefined" == typeof Handlebars && "function" == typeof define && define.amd) {
+        var scasl_tempamd = define.amd;
+        define.amd = void 0;
+        var scasl_fileref=document.createElement("script");
+        scasl_fileref.setAttribute("type","text/javascript"),
+        scasl_fileref.setAttribute("src","//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"),
+        document.getElementsByTagName("head")[0].appendChild(scasl_fileref),
+        setTimeout(function() {
+            define.amd=scasl_tempamd
+        }, 1e3);
+    }
+
+    document.addEventListener('DOMContentLoaded', function(event) {
+        function setKm() {
+            document.querySelectorAll('.bh-sl-maxdistance').forEach(function(select) {
+                Array.from(select.options).forEach(function(option) {
+                    if (!option.innerText.includes('No Limit')) {
+                        option.innerText += ' km'
+                    }
+                });
+            });
+        }
+        setTimeout(setKm, 5000);
+
+        function openHoursStoreViewsList() {
+            const openHours = document.querySelectorAll('.scasl-list-details');
+            for (const li of openHours) {
+                li.addEventListener('click', function () {
+                    setTimeout(setOpenTimeStore, 5000);
+                });
+            }
+        }
+        setTimeout(openHoursStoreViewsList, 5000);
+
+        const cusBtnSubmit = document.getElementById('bh-sl-submit-mobile');
+        const btnSubmit = document.getElementById('bh-sl-submit');
+        if(cusBtnSubmit) {
+            cusBtnSubmit.addEventListener('click', function() {
+                btnSubmit.click();
+            });
+        }
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer.js"></script>
+
+<script id="scasl-infowindow-template" class="!hidden" type="text">
+    {%raw%}
+        {{#location}}
+            <div id="scasl-window-container" class="scasl-info-window">
+                <div id="scasl-store_image" class="scasl-info-image scasl-field">
+                    <img src="{{ store_image }}" alt="" width="178" height="178" loading="lazy" class="m-0" />
+                </div>
+
+                <div class="scasl-info-location">
+                    <div id="scasl-title" class="scasl-field">{{name}}</div> 
+                    <div id="scasl-address" class="scasl-field">{{address}}</div>
+                        
+                    {{#if fax}}
+                        <div id="scasl-fax" class="scasl-field">
+                            <span id="scasl-fax-label">Fax:</span> {{fax}}
+                        </div>
+                    {{/if}}
+                    {{#if email}}
+                        <div id="scasl-email" class="scasl-field">
+                            <span id="scasl-email-label">Email:</span> <a href="mailto:{{email}}">{{email}}</a>
+                        </div>
+                    {{/if}}
+                    {{#each cfields}}
+                        <div id="scasl-extra">
+                            <span>{{key}}</span>:<span>{{{value}}}</span>
+                        </div>
+                    {{/each}}
+                    {{#if web}}
+                        <div id="scasl-web" class="scasl-field">
+                            <a href="{{web}}" target="_blank">
+                                {{#if webdisplay}}
+                                    {{webdisplay}}
+                                {{else}}
+                                    {{niceURL web}}
+                                {{/if}}
+                            </a>
+                        </div>
+                    {{/if}}
+
+                    {{#if operating_hours}}
+                        <div class="scasl-operating-hour scasl-field">
+                            <div class="scasl-field-open">
+                                <strong>Open today:</strong>
+                                {{#each oh_data}}
+                                    {{#if @first}}
+                                        <p class="scasl-field-open-value">{{data1.content}}</p>
+                                    {{/if}}
+                                {{/each}}
+                            </div>                           
+                        </div>
+                    {{/if}}
+
+                    {{#if schedule}}
+                        <div id="scasl-schedule" class="scasl-field">
+                            <strong id="scasl-schedule-label">Store Message:</strong> <span>{{{schedule}}}</span>
+                        </div>
+                    {{/if}}
+                    <div class="scasl-cta">
+                        {{#if phone}}
+                            <div id="scasl-phone" class="scasl-field">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.0938 10.6875C12.5976 10.1875 11.3957 9.45781 10.8126 9.16375C10.0532 8.78125 9.99068 8.75 9.39381 9.19344C8.99568 9.48938 8.73099 9.75375 8.26506 9.65438C7.79912 9.555 6.78662 8.99469 5.90006 8.11094C5.01349 7.22719 4.42068 6.18531 4.32099 5.72094C4.22131 5.25656 4.49006 4.995 4.78318 4.59594C5.19631 4.03344 5.16506 3.93969 4.81193 3.18031C4.53662 2.58969 3.78568 1.39906 3.28381 0.905313C2.74693 0.375001 2.74693 0.468751 2.40099 0.612501C2.11936 0.730997 1.84917 0.875036 1.59381 1.04281C1.09381 1.375 0.816307 1.65094 0.622244 2.06563C0.428182 2.48031 0.340994 3.4525 1.34318 5.27313C2.34537 7.09375 3.04849 8.02469 4.50381 9.47594C5.95912 10.9272 7.07818 11.7075 8.71412 12.625C10.7379 13.7584 11.5141 13.5375 11.9301 13.3438C12.346 13.15 12.6232 12.875 12.956 12.375C13.1242 12.1201 13.2686 11.8502 13.3872 11.5688C13.5313 11.2241 13.6251 11.2241 13.0938 10.6875Z" stroke="#164569" stroke-miterlimit="10"/>
+                                </svg>
+                                <a href="tel:{{phone}}">{{phone}}</a>
+                            </div>
+                        {{/if}}
+                        <div id="scasl-direction" class="scasl-field">
+                            <svg width="16" height="16" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.125 0.25C13.0781 0.25 13.0312 0.273438 12.9844 0.296875L9 1.75L4.96875 0.34375C4.82812 0.296875 4.61719 0.273438 4.47656 0.25C4.33594 0.25 4.17188 0.296875 4.00781 0.34375L0.46875 1.5625C0.210938 1.67969 0 1.98438 0 2.26562V10.375C0 10.6094 0.164062 10.75 0.351562 10.75C0.398438 10.75 0.445312 10.75 0.492188 10.7266L4.5 9.25L8.53125 10.6797C8.64844 10.7266 8.85938 10.75 9 10.75C9.11719 10.75 9.32812 10.7266 9.46875 10.6797L13.0078 9.46094C13.2656 9.34375 13.5 9.03906 13.5 8.75781V0.648438C13.5 0.414062 13.3125 0.25 13.125 0.25ZM5.25 1.63281L8.25 2.6875V9.39062L5.25 8.33594V1.63281ZM1.125 9.32031V2.54688L4.125 1.49219V8.19531H4.10156L1.125 9.32031ZM12.375 8.47656L9.375 9.53125V2.82812L12.375 1.70312V8.47656Z" fill="#164569"/>
+                            </svg>
+                            <a href="https://maps.google.com/maps?saddr={{origin}}&amp;daddr={{address}} {{address2}} {{city}}, {{state}} {{postal}}" target="_blank">Get Directions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/location}}
+    {%endraw%}
+</script>
+
+<script id="scasl-list-template" class="!hidden" type="text">
+    {%raw%}
+        {{#location}}
+            <li id="scasl-list-container" data-markerid="{{markerid}}">
+                <div class="list-details scasl-list-details">
+                    <div class="list-content scasl-list-content">
+                        <div id="scasl-title" class="scasl-field">{{name}}</div> 
+                        <div id="scasl-address" class="scasl-field">{{address}}</div>
+                        
+                        {{#if fax}}
+                            <div id="scasl-fax" class="scasl-field">
+                                <span id="scasl-fax-label">Fax:</span> {{fax}}
+                            </div>
+                        {{/if}}
+                        {{#if email}}
+                            <div id="scasl-email" class="scasl-field">
+                                <span id="scasl-email-label">Email:</span> <a href="mailto:{{email}}">{{email}}</a>
+                            </div>
+                        {{/if}}
+                        {{#each cfields}}
+                            <div id="scasl-extra">
+                                <span>{{key}}</span>:<span>{{{value}}}</span>
+                            </div>
+                        {{/each}}
+                        
+                        {{#if operating_hours}}
+                            <div class="scasl-operating-hour scasl-field">
+                                <div class="scasl-field-open">
+                                    <strong>Open today:</strong>
+                                    {{#each oh_data}}
+                                        {{#if @first}}
+                                            <p class="scasl-field-open-value">{{data1.content}}</p>
+                                        {{/if}}
+                                    {{/each}}
+                                </div>
+                                <div class="minimize-oh-wrapper !hidden">
+                                    <span class="main-oh-status">View full store hours</span>
+                                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1.375 1.1875L7 6.8125L12.625 1.1875" stroke="#737373" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="maximize-oh-wrapper !hidden">
+                                    <table class="maximize-oh-wrapper-table">
+                                        {{#each oh_data}}
+                                            <tr>
+                                                <td rowspan={{rowspan}} class="{{data1.class}} title">{{ name }}</td>
+                                                <td class="{{data1.class}} content">{{data1.content}}</td>
+                                            </tr>
+                                            {{#leftData}}
+                                                <tr>
+                                                    <td class="{{class}}">{{content}}{{#if timeDiffer}}<br><span class="time-different" style="color: #dd860e !important;">Hours might differ</span>{{/if}}{{#if currentTimezoneText}}<br>{{currentTimezoneText}}{{/if}}</td>
+                                                </tr>
+                                            {{/leftData}}
+                                            {{content}}
+                                        {{/each}}
+                                    </table>
+
+                                    <div class="maximize-oh-status">
+                                        <span class="main-oh-status">Hide full store hours</span>
+                                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1.375 1.1875L7 6.8125L12.625 1.1875" stroke="#737373" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </div>                               
+                            </div>
+                        {{/if}}
+
+                        {{#if schedule}}
+                            <div id="scasl-schedule" class="scasl-field">
+                                <strong id="scasl-schedule-label">Store Message:</strong> <span>{{{schedule}}}</span>
+                            </div>
+                        {{/if}}
+                        <div class="scasl-cta">
+                            {{#if phone}}
+                                <div id="scasl-phone" class="scasl-field">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13.0938 10.6875C12.5976 10.1875 11.3957 9.45781 10.8126 9.16375C10.0532 8.78125 9.99068 8.75 9.39381 9.19344C8.99568 9.48938 8.73099 9.75375 8.26506 9.65438C7.79912 9.555 6.78662 8.99469 5.90006 8.11094C5.01349 7.22719 4.42068 6.18531 4.32099 5.72094C4.22131 5.25656 4.49006 4.995 4.78318 4.59594C5.19631 4.03344 5.16506 3.93969 4.81193 3.18031C4.53662 2.58969 3.78568 1.39906 3.28381 0.905313C2.74693 0.375001 2.74693 0.468751 2.40099 0.612501C2.11936 0.730997 1.84917 0.875036 1.59381 1.04281C1.09381 1.375 0.816307 1.65094 0.622244 2.06563C0.428182 2.48031 0.340994 3.4525 1.34318 5.27313C2.34537 7.09375 3.04849 8.02469 4.50381 9.47594C5.95912 10.9272 7.07818 11.7075 8.71412 12.625C10.7379 13.7584 11.5141 13.5375 11.9301 13.3438C12.346 13.15 12.6232 12.875 12.956 12.375C13.1242 12.1201 13.2686 11.8502 13.3872 11.5688C13.5313 11.2241 13.6251 11.2241 13.0938 10.6875Z" stroke="#1F1F1F" stroke-miterlimit="10"/>
+                                    </svg>
+                                    <a href="tel:{{phone}}">{{phone}}</a>
+                                </div>
+                            {{/if}}
+
+                            <div id="scasl-direction" class="scasl-field">
+                                <svg width="16" height="16" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.125 0.25C13.0781 0.25 13.0312 0.273438 12.9844 0.296875L9 1.75L4.96875 0.34375C4.82812 0.296875 4.61719 0.273438 4.47656 0.25C4.33594 0.25 4.17188 0.296875 4.00781 0.34375L0.46875 1.5625C0.210938 1.67969 0 1.98438 0 2.26562V10.375C0 10.6094 0.164062 10.75 0.351562 10.75C0.398438 10.75 0.445312 10.75 0.492188 10.7266L4.5 9.25L8.53125 10.6797C8.64844 10.7266 8.85938 10.75 9 10.75C9.11719 10.75 9.32812 10.7266 9.46875 10.6797L13.0078 9.46094C13.2656 9.34375 13.5 9.03906 13.5 8.75781V0.648438C13.5 0.414062 13.3125 0.25 13.125 0.25ZM5.25 1.63281L8.25 2.6875V9.39062L5.25 8.33594V1.63281ZM1.125 9.32031V2.54688L4.125 1.49219V8.19531H4.10156L1.125 9.32031ZM12.375 8.47656L9.375 9.53125V2.82812L12.375 1.70312V8.47656Z" fill="#404346"/>
+                                </svg>
+                                <a href="https://maps.google.com/maps?saddr={{origin}}&amp;daddr={{address}} {{address2}} {{city}}, {{state}} {{postal}}" target="_blank">Get Directions</a>
+                            </div>
+                        </div>
+                        {{#if web}}
+                            <div id="scasl-web" class="scasl-field">
+                                <a href="{{web}}" target="_blank" class="btn btn-secondary show-shadow">
+                                    {{#if webdisplay}}
+                                        {{webdisplay}}
+                                    {{else}}
+                                        {{niceURL web}}
+                                    {{/if}}
+                                </a>
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+            </li>
+        {{/location}}
+    {%endraw%}
+</script>

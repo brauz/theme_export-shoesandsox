@@ -1,0 +1,23 @@
+{% if section.settings.menu %}
+    <div class="nav_customer w-full">
+        {%- assign menu_linklist = linklists[section.settings.menu].links -%}
+        <ul id="customer-nav-content" class="flex xlxs:justify-start justify-center">
+            {% for link in menu_linklist %}
+                <li class="mr-3 md:mr-5 {% if request.path == link.url %}active{% endif %}"><a href="{{ link.url }}" class="text-sm leading-x22 text-grey-500 underline" >{{ link.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% schema %}
+{
+    "name": "Checkout Menu",
+    "settings": [
+        {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Menu"
+        }
+    ]
+} 
+{% endschema %}

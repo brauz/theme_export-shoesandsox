@@ -1,0 +1,73 @@
+{% layout none %}
+{% comment %}
+	Metafields named this way to be consistent with the searchspring
+{% endcomment %}
+
+{% assign swatchesProduct = product.metafields.accentuate.swatches_product | split: '|' %}
+{% if swatchesProduct != blank %}
+    {% for item in swatchesProduct %}
+	    {% assign productChild = all_products[item] %}
+	    {% assign productImage = productChild.media[0] | img_url: 'master'%}
+	    {% assign productSwatchLink = productSwatchLink | append: productChild.url | append: '|' %}
+	    {% assign productSwatchImage = productSwatchImage | append: productImage | append: '|' %}
+    {% endfor %}
+{% endif %}
+
+{% capture product_metafields %}
+	{
+		"mfield_related_products_product_handle": {{product.metafields.related_products.product_handle | json}},
+		"mfield_accentuate_swatches_product_handle": {{product.metafields.accentuate.swatches_product | json}},
+		"mfield_accentuate_swatches_product_link": {{productSwatchLink | json}},
+		"mfield_accentuate_swatches_product_image": {{productSwatchImage | json}},
+		"mfield_accentuate_colour_name": {{product.metafields.accentuate.colour_name | json}},
+		"mfield_accentuate_promo_line": {{ product.metafields.accentuate.promo_line | json }},
+		"mfield_accentuate_promo_description": {{ product.metafields.accentuate.promo_description | json }},
+		"mfield_utopia_default_size_range": {{product.metafields.utopia.default_size_range | json}},
+		"mfield_utopia_universal_size_map": {{ product.metafields.utopia.universal_size_map.value | json }},
+		"mfield_utopia_customer_facing_product_name": {{ product.metafields.utopia.customer_facing_product_name | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III" |  | json }}
+	}
+{% endcapture %}
+
+{
+	"available": {{product.available | json}},
+	"collections": {{product.collections | json}},
+	"compare_at_price": {{product.compare_at_price | json}},
+	"compare_at_price_max": {{product.compare_at_price_max | json}},
+	"compare_at_price_min": {{product.compare_at_price_min | json}},
+	"compare_at_price_varies": {{product.compare_at_price_varies | json}},
+	"content": {{product.content | json}},
+	"created_at": {{product.created_at | json}},
+	"description": {{product.description | json}},
+	"featured_image": {{product.featured_image | json}},
+	"featured_media": {{product.featured_media | json}},
+	"first_available_variant": {{product.first_available_variant | json}},
+	"gift_card?":{{product.available gift_card json}},
+	"handle": {{product.handle | json}},
+	"has_only_default_variant": {{product.has_only_default_variant | json}},
+	"id": {{product.id | json}},
+	"images": {{product.images | json}},
+	"media": {{product.media | json}},
+	"metafields": {{product_metafields}},
+	"options": {{product.options | json}},
+	"options_by_name": {{product.options_by_name | json}},
+	"options_with_values": {{product.options_with_values | json}},
+	"price": {{product.price | json}},
+	"price_max": {{product.price_max | json}},
+	"price_min": {{product.price_min | json}},
+	"price_varies": {{product.price_varies | json}},
+	"published_at": {{product.published_at | json}},
+	"requires_selling_plan": {{product.requires_selling_plan | json}},
+	"selected_or_first_available_selling_plan_allocation": {{product.selected_or_first_available_selling_plan_allocation | json}},
+	"selected_or_first_available_variant": {{product.selected_or_first_available_variant | json}},
+	"selected_selling_plan": {{product.selected_selling_plan | json}},
+	"selected_selling_plan_allocation": {{product.selected_selling_plan_allocation | json}},
+	"selected_variant": {{product.selected_variant | json}},
+	"selling_plan_groups": {{product.selling_plan_groups | json}},
+	"tags": {{product.tags | json}},
+	"template_suffix": {{product.template_suffix | json}},
+	"title": {{product.title | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III" | json}},
+	"type": {{product.type | json}},
+	"url": {{product.url | json}},
+	"variants": {{product.variants | json}},
+	"vendor": {{product.vendor | json}}
+}

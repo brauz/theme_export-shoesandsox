@@ -1,0 +1,47 @@
+{% capture src_url %}{{ 'feature-collection.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{{ 'feature-collection.css' | asset_url | stylesheet_tag }}
+
+<div class="md:px-4 xl:px-20 mx-auto overflow-hidden">
+  <div class="section-feature-collection overflow-hidden" data-section="{{ section.id }}">
+    {% if section.settings.title != blank %}    
+      <div class="flex items-center mb-4 lg:mb-8 px-4 md:px-0">
+        <span class="swiper-prev text-grey-400 w-5 h-5 lg:w-8 lg:h-8 flex justify-center items-center cursor-default max-md:order-2">{% render 'icon-chevron-left', class: 'w-5 h-5 lg:w-8 lg:h-8' %}</span>
+        {% if section.settings.title != blank %}
+          <h3 class="text-xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold m-0 mx-auto max-md:order-1 max-md:ml-0">{{ section.settings.title }}</h3>
+        {% endif %}
+        <span class="swiper-next text-grey-400 w-5 h-5 lg:w-8 lg:h-8 flex justify-center items-center cursor-default max-md:order-3">{% render 'icon-chevron-right', class: 'w-5 h-5 lg:w-8 lg:h-8' %}</span>
+      </div>
+    {% endif %}
+    <div class="product-wrapper swiper-wrapper md:pr-0 pr-4">
+      {%- for product in section.settings.featured_collection.products limit: section.settings.number_of_products_to_show -%} 
+        {% render 'product-card', product: product, class: 'swiper-slide !h-auto w-full', padding: 'p-3 pb-0 md:p-0 md:pt-3' %}
+      {%- endfor -%}
+    </div>
+    <div class="swiper-feature-collection-pagination mx-auto mt-6 lg:mt-10 flex justify-center max-w-49 w-full text-center leading-0"></div>
+  </div>
+</div>
+
+{% schema %} 
+  { "name": "featured-collection", 
+    "settings": [ 
+      { "type": "text",
+        "id": "title", 
+        "default": "Featured Collection", 
+        "label": "Title" 
+      }, 
+      { "type":
+        "collection", 
+        "id": "featured_collection", 
+        "label": "Collection" 
+      }, 
+      { "type":
+        "range", 
+        "id": "number_of_products_to_show", 
+        "label": "Number of products",
+        "min": 3, 
+        "max": 12, 
+        "default": 3 
+      } 
+    ], "presets": [ { "name": "Featured Collection" } ] } 
+{% endschema %}

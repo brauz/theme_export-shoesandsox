@@ -1,0 +1,60 @@
+{% capture src_collection %}{{ 'template-collection.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_collection, priority: 'normal', type: "defer" %}
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+
+<div class="pt-0 md:pt-8 pb-6 md:py-x72 px-0 md:px-4 xl:px-20">
+  <div class="max-w-full mx-auto">
+    <!-- Title -->
+    <div class="pb-3 md:pb-6 px-4 md:px-0">
+      <div class="text-left">
+        <h1 class="text-2xl md:text-3xl font-bold text-grey-900 m-0">{{ collection.title }}</h1>
+      </div>
+    </div>
+    <!-- Sub menu -->
+    {% assign sub_collection = collection.metafields.accentuate.menu_collection | split: '|' %}
+    {% if collection.metafields.accentuate.menu_collection %}
+      <div class="mx-auto overflow-hidden">
+        <div class="collection-nav-parent relative flex justify-start px-4 md:px-0">
+          <span class="back-nav-collection flex justify-center items-center rounded-20 lg:rounded-50 no-underline text-smbase md:text-base font-medium text-grey-900 hover:text-grey-900 bg-grey-100 hover:bg-border-default mr-2 md:mt-0.5 min-w-10 w-10 h-10 z-10 cursor-pointer">
+            <svg class="rotate-180" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.125 10H16.875" stroke="#1F1F1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11.25 4.375L16.875 10L11.25 15.625" stroke="#1F1F1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="nav-collection relative pb-4 md:pb-6 flex overflow-hidden">
+            <div class="swiper-wrapper">
+              {% for link in sub_collection %}
+              {% assign link_url = "/collections/" | append: link  %}
+              <a href="{{ link_url }}" class="item-nav-collection swiper-slide no-underline bg-grey-100 hover:bg-border-default rounded-20 md:rounded-50 px-3 md:px-x22 py-x9 md:py-2.5 text-smbase md:text-base text-grey-900 hover:text-grey-900 font-medium relative capitalize !w-auto text-ellipsis overflow-hidden whitespace-nowrap mr-2 last:mr-0 {% if request.path == link_url %} active {% endif %}" >{{ link | replace: "-", " " }}
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          <span class="next-nav-collection flex justify-center items-center rounded-20 lg:rounded-50 no-underline text-smbase md:text-base font-medium text-grey-900 hover:text-grey-900 bg-grey-100 hover:bg-border-default ml-2 md:mt-0.5 min-w-10 w-10 h-10 z-10 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.125 10H16.875" stroke="#1F1F1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11.25 4.375L16.875 10L11.25 15.625" stroke="#1F1F1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    {% endif %}
+    <!-- List product -->
+    <div class="border-b border-solid border-border-default h-px w-full"></div>
+    <div id="searchspring-init" class="md:mt-8"></div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "template-collection",
+    "settings": [
+      {
+        "type": "number",
+        "id": "number_of_products_per_page",
+        "default": 6,
+        "label": "Number of products shown per page"
+      }
+    ]
+  }
+{% endschema %}

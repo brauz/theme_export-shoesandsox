@@ -1,0 +1,143 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<div id="productTab" class="px-4 mx-auto xl:px-20 lg:py-[60px] lg:block border-b border-border-default pb-2 lg:pb-0 lg:border-0">
+    <!-- Make tab for desktop -->
+    <div class="product-tab mt-8 md:mt-0 hidden lg:block">
+        {% if section.blocks.size > 0 %}
+            <div class="flex flex-wrap gap-x-8">
+                {% for block in section.blocks %}
+                <h3 class="m-0 p-0 py-[18px] text-grey-900 font-normal text-lg leading-6 tab-title cursor-pointer" data-title="{{ block.settings.tab_title | handle }}">{{ block.settings.tab_title }}</h3>
+                {% endfor %}
+            </div>
+
+            <div class="tab-content border-t border-border-default py-8">
+                {% for block in section.blocks %}
+                <div class="tab-item" data-content="{{ block.settings.tab_title | handle }}">
+                    {% assign tabTitle = block.settings.tab_title | handle %}
+                    {% if tabTitle == 'delivery-returns' %}
+                        {% if product.metafields.custom.delivery_returns_text != blank %}
+                            {{ product.metafields.custom.delivery_returns_text }}
+                        {% else %}
+                            {{ block.settings.tab_content }}
+                        {% endif %}
+
+                    {% elsif tabTitle == 'materials-details' %}
+                        <ul class="m-0">
+                            {% if product.metafields.utopia.colour_code != blank %}
+                                <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.product_code' | t }}: <span class="font-normal">{{ product.metafields.utopia.colour_code }}</span></li>
+                            {% endif %}
+
+                            {% if product.metafields.utopia.sole_material != blank %}
+                                <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.sole_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.sole_material }}</span></li>
+                            {% endif %}
+
+                            {% if product.metafields.utopia.lining_material != blank %}
+                                <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.lining_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.lining_material }}</span></li>
+                            {% endif %}
+
+                            {% if product.metafields.utopia.upout_material != blank %}
+                                <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.upout_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.upout_material }}</span></li>
+                            {% endif %}
+
+                            {% if product.metafields.utopia.coo != blank %}
+                                <li class="!text-grey-900 font-bold">{{ 'product.coo' | t }}: <span class="font-normal">{{ product.metafields.utopia.coo }}</span></li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        {{ product.description }}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Make dropdown for mobile -->
+    <div class="lg:hidden mt-8">
+        {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+                {% assign tabTitle = block.settings.tab_title | handle %}
+                {% if tabTitle == 'delivery-returns' %}
+                    {% if product.metafields.custom.delivery_returns_text != blank %}
+                        {%- assign tabContent = product.metafields.custom.delivery_returns_text -%}
+                    {% else %}
+                        {%- assign tabContent = block.settings.tab_content -%}
+                    {% endif %}
+                {% endif %}
+                {% render 'product-accordion', title: block.settings.tab_title, content: block.settings.tab_content, tabContentReturn: tabContent, tabTitle: tabTitle, current_variant: current_variant %}
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+    function handleProductTab() {
+        const tabTitle = document.querySelectorAll('.tab-title');
+        const tabContent = document.querySelectorAll('.tab-item');
+        if (tabTitle) {
+            tabTitle[0].classList.add('active');
+
+            tabTitle.forEach((item) => {
+                item.addEventListener('click', function() {
+                    let dataTitle = item.getAttribute('data-title');
+                    let elmContent = document.querySelectorAll(`.tab-item[data-content=${dataTitle}]`);
+
+                    tabTitle.forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+
+                    tabContent.forEach(item => {
+                        item.classList.add('hidden');
+                    });
+
+
+                    item.classList.add('active');
+                    elmContent[0].classList.remove('hidden');
+                });
+            });
+        }
+
+        if (tabContent) {
+            tabContent.forEach(item => {
+                item.classList.add('hidden');
+            });
+
+            tabContent[0].classList.remove('hidden');
+            tabContent[0].classList.add('active');
+        }
+    }
+
+    handleProductTab();
+</script>
+
+{% schema %}
+    {
+        "name": "Product Tab",
+        "settings": [],
+        "blocks": [
+            {
+                "type": "tab_item",
+                "name": "Tab Item",
+                "settings": [
+                    {
+                        "type": "text",
+                        "id": "tab_title",
+                        "label": "Tab Title",
+                        "default": "Title"
+                    }, {
+                        "type": "richtext",
+                        "id": "tab_content",
+                        "label": "Tab Content",
+                        "default": "<p>Text here</p>"
+                    }
+                ]
+            }
+        ],
+        "presets": [
+            {
+                "name": "Product Tab"
+            }
+        ]
+    }
+{% endschema %}

@@ -1,0 +1,19 @@
+{% if section.settings.enable_bazaar_ratings %}
+<div class="bg-white lg:border-t lg:border-border-default px-4 py-8 lg:px-20 lg:pt-12 lg:pb-16" >
+    <div data-bv-show="seller_ratings"></div>
+  </div>
+{%- endif -%}
+
+{% schema %} 
+{
+"name": "Bazaar Footer Reviews",
+"settings": [
+    {
+        "type": "checkbox",
+        "id": "enable_bazaar_ratings",
+        "label": "Enable Bazaar Ratings",
+        "default": false
+    }
+]
+}
+{% endschema %}

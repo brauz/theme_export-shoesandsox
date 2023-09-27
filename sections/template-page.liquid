@@ -1,0 +1,62 @@
+{% capture src_url %}{{ 'template-page.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{% render 'breadcrumb' %}
+
+{{ 'template-page.css' | asset_url | stylesheet_tag }}
+
+{% if page.metafields.accentuate.is_store_detail_page %}
+  <div class="flex flex-wrap store-detail-page mx-auto px-4 pt-3 pb-3 md:pt-8 xl:px-20 md:pb-12">
+    <div class="store-sidebar w-full md:w-2/6 md:pr-8">
+      <h1 class="text-grey-900 mb-2">{{ page.title }}</h1>
+      <span class="back-button block mb-6 -mt-0.5"><a class="text-grey-900" href="/pages/store-locator">Back to all stores</a></span>
+      {% if page.metafields.accentuate.store_address %}
+      <p class="store-address text-base text-grey-700 mb-4">{{ page.metafields.accentuate.store_address }}</p>
+      {% endif %}
+      <div class="number-box flex mb-6 pb-6 border-b boreder-default">
+        {% if page.metafields.accentuate.phone_number %}
+          <a href="tel:{{ page.metafields.accentuate.phone_number }}" class="store-number no-underline inline-block mt-2 md:inline-block text-base text-grey-900 font-bold pb-1.5 border-b-2 border-accent-4 hover:text-grey-900 hover:border-grey-900 leading-5.5 transition-all mr-6">{{ page.metafields.accentuate.phone_number | text }}</a>
+        {% endif %}
+        {% if page.metafields.accentuate.store_directions %}
+          <a href="{{ page.metafields.accentuate.store_directions }}" class="store-address no-underline inline-block mt-2 md:inline-block text-base text-grey-900 font-bold pb-1.5 border-b-2 border-accent-4 hover:text-grey-900 hover:border-grey-900 leading-5.5 transition-all">Get Directions</a>
+        {% endif %}
+      </div>
+      <div class="open-hours flex flex-wrap">
+        {% if page.metafields.accentuate.opening_hour_title %}
+          <h4 class="store-time w-full text-grey-900 h4 mb-2">{{ page.metafields.accentuate.opening_hour_title }}</h4>
+        {% endif %}
+        {% if page.metafields.accentuate.store_hour_details %}
+          <div class="store-time-detail w-full">
+            {% assign store_hours = page.metafields.accentuate.store_hour_details | split: ", " %}
+            {% for open_hours in store_hours %}
+              {% assign hours = open_hours | split: "/" %}
+              <div class="flex mb-2"><span class="w-24 mr-10 text-input font-medium text-grey-900">{{ hours[0] }}</span><span class="text-input text-grey-700">{{ hours[1] }}</span></div>
+            {% endfor %}
+            </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="store-main w-full md:w-4/6 flex flex-wrap md:block">
+      <div class="maps-container mb-6 order-3 w-full">
+        {% if page.metafields.accentuate.google_maps_link %}
+          {{ page.metafields.accentuate.google_maps_link }}
+        {% endif %}
+      </div>
+      {% if page.metafields.accentuate.about_store_title %}
+        <h4 class="store-title text-grey-900 mb-2 w-full pt-6 md:pt-0 border-t border-border-default md:border-t-0">{{ page.metafields.accentuate.about_store_title }}</h4>
+      {% endif %}
+      {% if page.metafields.accentuate.store_description %}
+        <div class="store-desc text-grey-900 mb-6 w-full">{{ page.metafields.accentuate.store_description.html }}</div>
+      {% endif %}
+      {% if page.metafields.accentuate.store_button_title %}
+        <div class="w-full mb-6 md:mb-0">
+          <a href="{{page.metafields.accentuate.store_button_link}}" target='_blank' onclick='return tt.launchWorkflow(this);' class="store-desc btn btn-primary show-shadow no-underline w-full md:w-[261px]">{{ page.metafields.accentuate.store_button_title }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{%- else -%}
+  <div class="flex flex-col items-center">
+    <h1 class="my-8 text-3xl font-medium md:my-16" id="page_title">{{ page.title }}</h1>
+    <div class="max-w-x1058 px-4 mx-auto w-full {% if customer %} login {% else %} not_login {% endif %}" id="content_page">{{ page.content }}</div>
+  </div>
+{% endif %}

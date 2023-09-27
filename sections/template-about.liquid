@@ -1,0 +1,597 @@
+<style>
+
+    [data-section-id="{{ section.id }}"] .box-btn {
+        margin-top: {{ section.settings.btn_gap_top_mb | append: 'px' }};
+    }
+    {% if section.settings.background %}
+        [data-section-id="{{ section.id }}"] {
+            background-color: {{ section.settings.background }};
+        }
+    {% endif %}
+  
+    [data-section="{{ section.id }}"] {
+        padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+        padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+    }
+
+    [data-section-id="{{ section.id }}"] .content-section {
+        row-gap: {{ section.settings.section_gap_between_mb | append: 'px' }};
+    }
+
+    [data-section-id="{{ section.id }}"] .heading-section {
+        margin-bottom: {{ section.settings.heading_gap_top_mb | append: 'px' }};
+    }
+
+    @media (max-width: 580px) {
+        [data-section-id="{{ section.id }}"] .block__description {
+            padding-left: {{ section.settings.pd_left_mb_des | append: 'px' }};
+            padding-right: {{ section.settings.pd_right_mb_des | append: 'px' }};
+        } 
+    }
+
+    @media (min-width: 768px) {
+        [data-section="{{ section.id }}"] {
+            padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+            padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+        }
+    
+        [data-section-id="{{ section.id }}"] .box-btn {
+            margin-top: {{ section.settings.btn_gap_top_dt | append: 'px' }};
+        }
+    
+        [data-section-id="{{ section.id }}"] .heading-section {
+            margin-bottom: {{ section.settings.heading_gap_top_dt | append: 'px' }};
+        }
+    }
+  
+    @media (min-width: 1024px) {
+        [data-section="{{ section.id }}"] {
+            padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+            padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+        }
+    }
+</style>
+
+{% capture src_url %}{{ 'template-about.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-about.css' | asset_url | stylesheet_tag }}
+
+{% if section.blocks.size > 0 %}
+    <div class="hidden grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 md:grid-cols-1 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 gap-4 gap-5 gap-6 gap-8 md:gap-4 md:gap-5 md:gap-6 md:gap-8 lg:gap-4 lg:gap-5 lg:gap-6 lg:gap-8"></div>
+    <div {% unless section.settings.fullwidth %}class="mx-auto md:max-w-x1312 px-4" {% endunless %}data-section-id="{{ section.id }}">
+        <section {% if section.settings.border_bottom %}class="border-b border-border-default" {% endif %}>
+        <div class="section-image-with-text overflow-hidden" data-slider="{{ section.settings.enable_slider }}" data-item-per-slide-mobile="{{ section.settings.column_mobile }}" data-item-per-slide-tablet="{{ section.settings.column_tablet }}" data-item-per-slide-desktop="{{ section.settings.column_desktop }}" data-section="{{ section.id }}">
+            {% if section.settings.heading != blank %}
+            <h3 class="heading-section text-2xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold mb-6 lg:mb-8 col-span-full text-center">{{ section.settings.heading }}</h3>
+            {% endif %}
+            <div class="content-section {% if section.settings.enable_slider %}
+                        swiper-wrapper
+                        {% elsif section.settings.layout_block %}
+                        block
+                        {% else %}
+                        grid grid-cols-{{ section.settings.column_mobile }} md:grid-cols-{{ section.settings.column_tablet }} lg:grid-cols-{{ section.settings.column_desktop }}
+                        gap-{{ section.settings.gap_mobile }} md:gap-{{ section.settings.gap_tablet }} lg:gap-{{ section.settings.gap_desktop }}
+                        gap-y-8 lg:!grid lg:!box-border  
+                        {% endif %} lg:justify-center">
+                {% for block in section.blocks %}
+                    {% case block.type %}
+                        {% when 'img_text_below' %}
+                            {% if block.settings.image %}
+                                <div class="{% if section.settings.enable_slider %}swiper-slide {% endif %}relative w-full h-full flex flex-col md:pb-0 last:!pb-0 last:!mr-0" data-block-id="{{ block.id }}">
+                                    {%- liquid
+                                        assign aspect_ratio = block.settings.image.aspect_ratio
+                                        assign aspect_ratio_mb = block.settings.image_mobile.aspect_ratio
+                                        if block.settings.image.aspect_ratio == nil
+                                            assign aspect_ratio = 1
+                                        endif
+                                        if block.settings.image_mobile.aspect_ratio == nil
+                                            assign aspect_ratio_mb = 1
+                                        endif
+                                    -%}
+                                    <style>
+                                        [data-block-id="{{ block.id }}"] .group:before {
+                                            background: {{ block.settings.overlay }};
+                                            opacity: {{ block.settings.opacity | divided_by: 10.0 }};
+                                        }
+                                    </style>
+                                    {% if block.settings.image != blank %}
+                                        <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image_mobile != blank %}!hidden md:!block {% endif %}group relative w-full block rounded-sm overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1 {% if block.settings.radius_image %}rounded-full w-x140 h-x140 !pb-0 mx-auto{% endif %}" style="padding-bottom: {{ 1 | divided_by: aspect_ratio | times: 100 }}%;">
+                                            <img src="{{ block.settings.image | image_url: width: block.settings.image.width }}" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}"  alt="{{ block.settings.image.alt }}" class="absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400">
+                                        </a>
+                                    {% endif %}
+                                    {% if block.settings.image_mobile != blank %}
+                                        <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image != blank %}md:!hidden {% endif %}group relative w-full block rounded-sm overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1 {% if block.settings.radius_image %}rounded-full w-x140 h-x140 !pb-0 mx-auto{% endif %}" style="padding-bottom: {{ 1 | divided_by: aspect_ratio_mb | times: 100 }}%;">
+                                            <img src="{{ block.settings.image_mobile | image_url: width: block.settings.image_mobile.width }}" loading="lazy" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}"  alt="{{ block.settings.image_mobile.alt }}" class="absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400">
+                                        </a>
+                                    {% endif %}
+                                    {% if block.settings.title != blank or block.settings.description != blank or block.settings.button != blank %}
+                                        <div class="block text-center md:px-4{% if block.settings.description != blank %} pt-6 {% else %} pt-4 lg:pt-6{% endif %}">
+                                            {% if block.settings.title != blank %}
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="no-underline block {% if block.settings.description != blank %}text-xl {% else %}text-lg leading-6 {% endif %}leading-7 text-xl lg:text-xl lg:leading-8 text-grey-900 hover:!text-grey-700 font-bold" title="{{ block.settings.title }}" style="color: {{ block.settings.text_color }};">{{ block.settings.title }}</a>
+                                            {% endif %}  
+                                            {% if block.settings.description != blank %}
+                                                <span class="no-underline block text-sm text-grey-700 leading-6 mt-2 block__description" style="color: {{ block.settings.description_color }};">{{ block.settings.description }}</span>
+                                            {% endif %}    
+                                            {% if block.settings.button != blank %}
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="no-underline {% if block.settings.description != blank %}inline-block mt-6 {% else %}hidden mt-4 {% endif %}md:inline-block text-base text-grey-900 font-bold pb-1.5 border-b-2 border-accent-4 hover:border-grey-900 leading-5.5 transition-all" title="{{ block.settings.title }} transition-all duration-400" style="color: {{ block.settings.text_color }};">{{ block.settings.button }}</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% when 'img_text_left' %}
+                            {% if block.settings.image %}
+                                <div class="w-full h-full flex flex-wrap md:flex-nowrap items-center md:pt-x72 pt-8 first:pt-0 last:!mr-0 opacity-100 transition-all duration-400 {% if block.settings.text_left %}flex-row-reverse{% endif %}" data-block-id="{{ block.id }}">
+                                    {%- liquid
+                                        assign aspect_ratio = block.settings.image.aspect_ratio
+                                        assign aspect_ratio_mb = block.settings.image_mobile.aspect_ratio
+                                        if block.settings.image.aspect_ratio == nil
+                                            assign aspect_ratio = 1
+                                        endif
+                                        if block.settings.image_mobile.aspect_ratio == nil
+                                            assign aspect_ratio_mb = 1
+                                        endif
+                                    -%}
+                                    {% if block.settings.image != blank %}
+                                        <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image_mobile != blank %}!hidden md:!block {% endif %}group relative w-full block overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1 md:w-1/2 {% if block.settings.radius_image %}rounded-full w-x140 h-x140 !pb-0 mx-auto{% endif %}">
+                                            <img src="{{ block.settings.image | image_url: width: block.settings.image.width }}" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}"  alt="{{ block.settings.image.alt }}" class="block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400">
+                                        </a>
+                                    {% endif %}
+                                    {% if block.settings.image_mobile != blank %}
+                                        <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image != blank %}md:!hidden {% endif %}group relative w-full block overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1 md:w-1/2 {% if block.settings.radius_image %}rounded-full w-x140 h-x140 !pb-0 mx-auto{% endif %}">
+                                            <img src="{{ block.settings.image_mobile | image_url: width: block.settings.image_mobile.width }}" loading="lazy" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}"  alt="{{ block.settings.image_mobile.alt }}" class="block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400">
+                                        </a>
+                                    {% endif %}
+                                    {% if block.settings.title != blank or block.settings.description != blank or block.settings.button != blank %}
+                                        <div class="block text-left w-full mt-6 md:mt-0 {% if block.settings.text_left%}pr-0 md:pr-6 lg:pr-24{% else %}pl-0 md:pl-6 lg:pl-24{% endif %} md:w-1/2">
+                                            {% if block.settings.title %}
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="no-underline block md:!text-3xl !text-2xl leading-7 lg:leading-8 text-grey-900 hover:text-grey-700 font-bold" title="{{ block.settings.title }}" style="color: {{ block.settings.text_color }}; font-size: {{ block.settings.heading_size | append: 'px' }}">{{ block.settings.title }}</a>
+                                            {% endif %}  
+                                            {% if block.settings.description %}
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="no-underline block text-sm text-grey-700 leading-6 mt-4" title="{{ block.settings.title }}" style="color: {{ block.settings.description_color }};">{{ block.settings.description }}</a>
+                                            {% endif %}    
+                                            {% if block.settings.button %}
+                                            <div class="w-full text-left mt-6 flex gap-4">
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="btn btn-primary show-shadow no-underline {% if section.settings.layout_block %}w-full-8{% else %} w-full{% endif %} md:w-x154 !py-3" title="{{ block.settings.title }} transition-all duration-400" style="color: {{ block.settings.text_color }};">{{ block.settings.button }}</a>
+
+                                                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="no-underline transition-all btn btn-hollow show-shadow {% if section.settings.layout_block %}w-full-8{% else %} w-full{% endif %} md:w-x154 !py-3 md:mt-0" title="{{ block.settings.title }} transition-all duration-400" style="color: {{ block.settings.text_color }};">{{ block.settings.button }}</a>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                    {% endcase %}
+                {% endfor %}
+            </div>
+    
+            {% if section.settings.button_text != blank and section.settings.link_button != blank %}
+                <div class="box-btn w-full h-full text-center">
+                    <a href="{{ section.settings.link_button }}" class="btn btn-primary show-shadow no-underline w-full md:w-x154 !py-3">{{ section.settings.button_text }}</a>
+                </div>
+            {% endif %}
+        </div>
+        </section>
+    </div>
+{% endif %}
+  
+{% schema %}
+    {
+        "name": "About Image Text",
+        "settings": [
+            {
+                "type": "checkbox",
+                "id": "border_bottom",
+                "label": "Enable border bottom"
+            },
+            {
+                "type": "checkbox",
+                "id": "fullwidth",
+                "label": "Full width"
+            },
+            {
+                "type": "checkbox",
+                "id": "enable_slider",
+                "label": "Enable slider"
+            },
+            {
+                "type": "checkbox",
+                "id": "layout_block",
+                "label": "Enable Layout Block",
+                "default": false
+            },
+            {
+                "type": "text",
+                "id": "button_text",
+                "label": "Button text",
+                "default": "Learn More"
+            },
+            {
+                "type": "url",
+                "id": "link_button",
+                "label": "Link Button"
+            },
+            {
+                "type": "text",
+                "id": "heading",
+                "label": "Heading"
+            },
+            {
+                "type": "color",
+                "id": "background",
+                "label": "Background color"
+            },
+            {
+                "type": "range",
+                "id": "btn_gap_top_dt",
+                "label": "Gap Top Desktop",
+                "max": 100,
+                "min": 20,
+                "step": 1,
+                "default": 40
+            },
+            {
+                "type": "range",
+                "id": "btn_gap_top_mb",
+                "label": "Gap Top Mobile",
+                "max": 100,
+                "min": 20,
+                "step": 1,
+                "default": 40
+            },
+            {
+                "type": "header",
+                "content": "Heading Section"
+            },
+            {
+                "type": "range",
+                "id": "heading_gap_top_dt",
+                "label": "Gap Top Desktop",
+                "max": 50,
+                "min": 20,
+                "step": 1,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "heading_gap_top_mb",
+                "label": "Gap Top Mobile",
+                "max": 50,
+                "min": 20,
+                "step": 1,
+                "default": 32
+            },
+            {
+                "type": "header",
+                "content": "Section"
+            },
+            {
+                "type": "range",
+                "id": "section_gap_between_dt",
+                "label": "Section Gap Between Desktop",
+                "max": 80,
+                "min": 0,
+                "step": 1,
+                "default": 48
+            },
+            {
+                "type": "range",
+                "id": "section_gap_between_mb",
+                "label": "Section Gap Between Mobile",
+                "max": 80,
+                "min": 0,
+                "step": 1,
+                "default": 48
+            },
+            {
+                "type": "header",
+                "content": "Desktop"
+            },
+            {
+                "type": "range",
+                "id": "column_desktop",
+                "label": "Item per row",
+                "max": 4,
+                "min": 1,
+                "step": 1,
+                "default": 2
+            },
+            {
+                "type": "range",
+                "id": "gap_desktop",
+                "label": "Gap between items",
+                "max": 12,
+                "min": 4,
+                "step": 1,
+                "default": 6
+            },
+            {
+                "type": "range",
+                "id": "pd_top_dt",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_dt",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "header",
+                "content": "Tablet"
+            },
+            {
+                "type": "range",
+                "id": "column_tablet",
+                "label": "Item per row",
+                "max": 4,
+                "min": 1,
+                "step": 1,
+                "default": 2
+            },
+            {
+                "type": "range",
+                "id": "gap_tablet",
+                "label": "Gap between items",
+                "max": 12,
+                "min": 4,
+                "step": 1,
+                "default": 4
+            },
+            {
+                "type": "range",
+                "id": "pd_top_tl",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 36
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_tl",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 36
+            },
+            {
+                "type": "header",
+                "content": "Mobile"
+            },
+            {
+                "type": "range",
+                "id": "column_mobile",
+                "label": "Item per row",
+                "max": 3,
+                "min": 1,
+                "step": 1,
+                "default": 1
+            },
+            {
+                "type": "range",
+                "id": "gap_mobile",
+                "label": "Gap between items",
+                "max": 12,
+                "min": 4,
+                "step": 1,
+                "default": 4
+            },
+            {
+                "type": "range",
+                "id": "pd_top_mb",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_mb",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "pd_left_mb_des",
+                "label": "Padding Left Description",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 0
+            },
+            {
+                "type": "range",
+                "id": "pd_right_mb_des",
+                "label": "Padding Right Description",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 0
+            }
+        ],
+        "blocks": [
+            {
+                "name": "Image with text below",
+                "type": "img_text_below",
+                "settings": [
+                    {
+                        "type": "image_picker",
+                        "id": "image",
+                        "label": "Image"
+                    },
+                    {
+                        "type": "image_picker",
+                        "id": "image_mobile",
+                        "label": "Image mobile"
+                    },
+                    {
+                        "type": "checkbox",
+                        "id": "radius_image",
+                        "label": "Image Circle",
+                        "default": false
+                    },
+                    {
+                        "type": "color",
+                        "id": "overlay",
+                        "label": "Overlay"
+                    },
+                    {
+                        "type": "range",
+                        "id": "opacity",
+                        "label": "Opacity overlay",
+                        "max": 10,
+                        "min": 0,
+                        "step": 1,
+                        "default": 1
+                    },
+                    {
+                        "type": "color",
+                        "id": "text_color",
+                        "label": "Heading color",
+                        "default": "#1F1F1F"
+                    },
+                    {
+                        "type": "color",
+                        "id": "description_color",
+                        "label": "Description color",
+                        "default": "#1F1F1F"
+                    },
+                    {
+                        "type": "text",
+                        "id": "title",
+                        "label": "Heading"
+                    },
+                    {
+                        "type": "text",
+                        "id": "description",
+                        "label": "Description"
+                    },
+                    {
+                        "type": "text",
+                        "id": "button",
+                        "label": "Button text"
+                    },
+                    {
+                        "type": "url",
+                        "id": "url",
+                        "label": "Url"
+                    },
+                    {
+                        "type": "checkbox",
+                        "id": "new_tab",
+                        "label": "Open in new tab",
+                        "default": true
+                    }
+                ]
+            },
+            {
+                "name": "Image with text left",
+                "type": "img_text_left",
+                "settings": [
+                    {
+                        "type": "image_picker",
+                        "id": "image",
+                        "label": "Image"
+                    },
+                    {
+                        "type": "image_picker",
+                        "id": "image_mobile",
+                        "label": "Image mobile"
+                    },
+                    {
+                        "type": "checkbox",
+                        "id": "radius_image",
+                        "label": "Image Circle",
+                        "default": false
+                    },
+                    {
+                        "type": "checkbox",
+                        "id": "text_left",
+                        "label": "Text Left",
+                        "default": false
+                    },
+                    {
+                        "type": "color",
+                        "id": "overlay",
+                        "label": "Overlay"
+                    },
+                    {
+                        "type": "range",
+                        "id": "opacity",
+                        "label": "Opacity overlay",
+                        "max": 10,
+                        "min": 0,
+                        "step": 1,
+                        "default": 1
+                    },
+                    {
+                        "type": "color",
+                        "id": "text_color",
+                        "label": "Heading color",
+                        "default": "#1F1F1F"
+                    },
+                    {
+                        "type": "range",
+                        "id": "heading_size",
+                        "label": "Font Size",
+                        "max": 30,
+                        "min": 0,
+                        "step": 1,
+                        "default": 20
+                    },
+                    {
+                        "type": "color",
+                        "id": "description_color",
+                        "label": "Description color",
+                        "default": "#1F1F1F"
+                    },
+                    {
+                        "type": "text",
+                        "id": "title",
+                        "label": "Heading"
+                    },
+                    {
+                        "type": "text",
+                        "id": "description",
+                        "label": "Description"
+                    },
+                    {
+                        "type": "text",
+                        "id": "button",
+                        "label": "Button text"
+                    },
+                    {
+                        "type": "url",
+                        "id": "url",
+                        "label": "Url"
+                    },
+                    {
+                        "type": "checkbox",
+                        "id": "new_tab",
+                        "label": "Open in new tab",
+                        "default": true
+                    }
+                ]
+            }
+        ],
+        "presets": [
+            {
+                "name": "About Image Text"
+            }
+        ]
+    }
+{% endschema %}

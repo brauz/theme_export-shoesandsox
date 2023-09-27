@@ -1,0 +1,31 @@
+{% liquid 
+    if template contains 'collection'
+        assign search_terms = collection.handle
+        assign search_type = 'collection'
+    endif
+
+    if template contains 'search'
+        assign search_terms = search.terms
+        assign search_type = 'search'
+    endif
+%}
+
+<script>
+  CD_STATE.searchspring = {
+    siteId: {{ settings.searchspring_site_id | json }},
+    searchTerms: {{ search_terms | json }},
+    searchType: {{ search_type | json }},
+    resultsPerPage: {{ settings.searchspring_results_per_page | default: 12 | json }},
+    defaultImage: `{{ 'product-2' | 'placeholder_svg_tag' }}`,
+    saleLabel: {{ settings.sale_image | json }},
+    enableSaleLabel: {{ settings.enable_sale_badge | default: false | json }}
+  }
+</script>
+
+{% comment %}
+  At present, only custom-select.scss and recommendations... may need to broaden later. They're not huge files anywa
+{% endcomment %}
+{% if template contains 'collection' or template contains 'search' %}
+  {{ 'searchspring-components.css' | asset_url | stylesheet_tag }}
+
+{% endif %}

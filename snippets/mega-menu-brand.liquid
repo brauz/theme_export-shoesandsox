@@ -1,0 +1,18 @@
+<ul class="menu-col menu-col list-none w-full xl:w-auto menu-column col-submenu col-brand-list h-max xl:py-10 xl:ml-5.5 block">
+  <li class="menu-links list-none level2 relative">
+    <a class="block xl:hidden no-underline flex items-center xl:inline relative text-grey-900 text-base font-bold border-t border-border-default" href="javascript:void(0)">
+      <span class="block w-full xl:w-auto p-5 pb-4">Top Brands</span>
+    </a>
+    <div class="px-5 xl:px-0 menu-links menu-links list-none level3 max-w-full xl:max-w-full grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 mb-4 xl:mb-0">
+      {% for i in (1..15) %}
+      {% assign image = 'brand_image_' | append: i %}
+      {% assign url_brand = 'brand_link_' | append: i %}
+        {% if mainBlock.settings[image] %}
+          <a href="{% if mainBlock.settings[url_brand] != blank %}{{ mainBlock.settings[url_brand] }}{% else %}#{% endif %}" class="no-underline overflow-hidden rounded-sm">
+            <img class="max-w-full h-full xl:h-20 w-full xl:w-x187 object-cover scale-100 hover:scale-105 duration-200 m-0 block rounded-sm" loading="lazy" src="{{ mainBlock.settings[image] | img_url: 'master' }}" />
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </li>
+</ul>

@@ -1,0 +1,161 @@
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {% if section.settings.background %}
+      background-color: {{ section.settings.background }};
+    {% endif %}
+    padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+    padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+    padding-left: {{ section.settings.pd_left_mb | append: 'px' }};
+    padding-right: {{ section.settings.pd_right_mb | append: 'px' }};
+  }
+  @media (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+    }
+  }
+  @media (min-width: 1024px) {
+    [data-section-id="{{ section.id }}"] {
+        padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+        padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+        padding-left: {{ section.settings.pd_left_dt | append: 'px' }};
+        padding-right: {{ section.settings.pd_right_dt | append: 'px' }};
+    }
+  }
+</style>
+
+{% assign description = section.settings.text | truncatewords: 39 %}
+<div class="section-delivery-content" data-section-id="{{ section.id }}">
+    {% if section.settings.text != blank %}
+        {% if section.settings.text != description %}
+        <p class="delivery-text text-sm leading-5.5 text-grey-700" data-less="{{ section.settings.text | truncatewords: 39  | strip_html }}" data-detail="{{ section.settings.text }}"><span class="content">{{ section.settings.text | truncatewords: 39 | strip_html }}</span>&nbsp;<span class="read-more text-grey-500 underline hover:text-grey-900 cursor-pointer">Read more</span></p>
+        {% else %}
+        <p class="delivery-text text-sm leading-5.5 text-grey-700">{{ section.settings.text  | strip_html }}</p>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% capture src_url %}{{ 'template-delivery.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-delivery.css' | asset_url | stylesheet_tag }}
+<script>
+  window.deliveryText = window.deliveryText || false;
+</script>
+{% schema %}
+    {
+        "name": "Delivery Text",
+        "class": "section-delivery",
+        "settings": [
+            {
+                "type": "richtext",
+                "id": "text",
+                "label": "Text",
+                "default": "<p></p>"
+            },
+            {
+                "type": "range",
+                "id": "pd_top_dt",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_dt",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "range",
+                "id": "pd_left_dt",
+                "label": "Padding left",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "range",
+                "id": "pd_right_dt",
+                "label": "Padding right",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 72
+            },
+            {
+                "type": "header",
+                "content": "Tablet"
+            },
+            {
+                "type": "range",
+                "id": "pd_top_tl",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 36
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_tl",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 36
+            },
+            {
+                "type": "header",
+                "content": "Mobile"
+            },
+            {
+                "type": "range",
+                "id": "pd_top_mb",
+                "label": "Padding top",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "pd_bottom_mb",
+                "label": "Padding bottom",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "pd_left_mb",
+                "label": "Padding left",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            },
+            {
+                "type": "range",
+                "id": "pd_right_mb",
+                "label": "Padding right",
+                "max": 100,
+                "min": 0,
+                "step": 2,
+                "default": 32
+            }
+        ],
+        "presets": [
+            {
+                "name": "Delivery Text"
+            }
+        ]
+    }
+{% endschema %}

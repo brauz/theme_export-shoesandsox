@@ -1,0 +1,146 @@
+<div id="megamenu-logo-mobile" class="megamenu-logo-mobile z-40 absolute -top-x18 right-3 hidden">
+  <div class="close-menu">
+    {% render 'icon-close-menu' %}
+  </div>
+</div>
+<div class="megamenu fixed top-0 w-full-minus-xl xl:w-full h-full overflow-y-auto overflow-x-hidden transition-left duration-300 ease-ease delay-75 z-50 bg-grey-100 xl:bg-white xl:static xl:overflow-x-visible xl:bg-transparent -left-full xl:left-0">
+  <div class="megamenu-inner">
+    <div class="menu-store-pickup flex items-center justify-center py-3 max-h-11.5 bg-primary xl:hidden">
+      {% render 'icon-home-white' %}
+      <span class="text-button text-white font-medium ml-1.5">In-store pickup: <a href="#" class="text-button text-white font-medium">Select store</a></span>
+    </div>
+    <ul class="main-menu w-full flex flex-wrap justify-center xl:static p-5 xl:p-0 bg-white gap-4 xl:gap-0">
+      {% for mainBlock in blocks %}
+        {% if mainBlock.type == 'main-item' or mainBlock.type == 'brand-item' %}
+          {% assign checkSubCateHasContent = false %}
+          {% if mainBlock.settings.column_1 != blank %}
+            {% assign checkSubCateHasContent = true %}
+          {% endif %}
+          <li class="group bg-white w-full xl:w-auto py-0 xl:py-6 xl:px-2 xlsm:px-4 list-none main-menu-item item-{{ forloop.index }} {% if checkSubCateHasContent %}has-dropdown{% endif %}">
+            <a style="background: {{ mainBlock.settings.background_color_menu_mobile}}" href="{{ mainBlock.settings.url }}" {% if checkSubCateHasContent %} name="menu-lv-1-open" onclick="if (window.innerWidth < 1300){return false;}" {% else %} {% endif %} class="main-links text-white xl:text-grey-900 hover:text-white xl:hover:text-accent-1 text-base font-bold xl:font-medium flex items-center xl:inline no-underline relative after:hidden after:xl:block after:content-empty {% if mainBlock.settings.title == 'Brands' %} after:w-focus-brands after:-left-1 {% else %} after:w-focus-menu after:-left-1.5 {% endif %} after:absolute after:-bottom-x25.4 after:scale-x-0 group-hover:after:scale-x-100 after:transition-textTFOP after:duration-double-0.3s after:ease-double-ease after:delay-double-0s after:origin-left-center group-hover:xl:text-accent-1 group-hover:after:border-b-2 group-hover:after:border-secondary h-25 rounded-sm xl:rounded-none">
+                <span class="w-full xl:w-auto p-6 xl:p-0 {% if mainBlock.settings.menu_sale %}has-sale text-white xl:text-error-content{% endif %}">{{ mainBlock.settings.title }}
+                  {% if checkSubCateHasContent %}
+                    <svg class="inline-block xl:hidden ml-3" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7.5 3.75L13.75 10L7.5 16.25" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  {% endif %}
+                </span>
+
+                {% if mainBlock.settings.background_image_menu_mobile %}
+                  <img class="block xl:hidden w-28 h-17 object-contain rounded-sm" loading="lazy" src="{{ mainBlock.settings.background_image_menu_mobile | img_url: 'master' }}" />
+                {% endif %}
+            </a>
+            <!-- Check if have child category -->
+            {% if checkSubCateHasContent%}
+              <div class="menu-dropdown transition-all duration-500 ease-ease delay-75 -z-10 xl:z-50 left-full xl:left-0 opacity-100 overflow-y-scroll xl:overflow-y-visible invisible xl:visible w-full h-screen xl:h-max absolute top-0 xl:top-full bg-white w-full xl:w-full border-t border-border-default" data-index="{{ forloop.index }}">
+                <div class="megamenu-mobile-top-title-lv2 block xl:hidden border-b border-border-default relative py-5 px-4 flex items-center justify-center">
+                  <svg class="back-menu-lv1 absolute top-5 left-5" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.5 16.25L6.25 10L12.5 3.75" stroke="#164569" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <a href="{{ mainBlock.settings.url }}"><h4 class="inline-block mb-0 text-base text-grey-900">{{ mainBlock.settings.title }}</h4></a>
+                </div>
+                <div class="menu-dropdown-content xl:h-x366 xl:max-h-x366 overflow-y-visible xl:overflow-y-auto">
+                  <div class="dropdown-right-content flex flex-wrap justify-center xl:justify-between xlmd:justify-center xl:flex-nowrap mx-auto max-w-full px-0 xl:px-20 mb-3 xl:mb-0 {% if checkSubCateHasContent %}has-content{% endif %}">
+                    {% for i in (1..mainBlock.settings.column_1.links.size) %}
+                    {% assign menuLink = 'column_' | append: i %}
+                      {% if mainBlock.settings[menuLink] != blank %}
+                        <div class="menu-column col-submenu flex justify-start w-full xl:w-auto mb-0 {% if mainBlock.type != 'brand-item' %} flex-wrap xlmd:flex-nowrap {% endif %} {% if mainBlock.settings.column_1.links.size <= 5 %} xlmd:flex-nowrap {% endif %}">
+                          <ul class="menu-col list-none w-full min-w-full xl:border-b-0 border-border-default xl:w-auto mr-0 xl:mr-4 xlmd:mr-8 pt-0 xl:pt-2 min-w-auto xl:min-w-x200 xlmd:min-w-x232">
+                            {% assign column_first = mainBlock.settings.items_first_column | plus: 1 %}
+                            {% assign column_two = column_first | plus: mainBlock.settings.items_two_column %}
+                            {% assign column_three = column_two | plus: mainBlock.settings.items_three_column %}
+                            {% assign column_four = column_three | plus: mainBlock.settings.items_four_column %}
+
+                            {% for links in linklists[mainBlock.settings[menuLink]].links %}
+                              <!-- Set column two -->
+                              {% if mainBlock.type == 'main-item' %}
+                                {% if forloop.index == column_four %}
+                                  </ul><ul class="menu-col list-none w-full min-w-full xl:border-b-0 border-border-default xl:w-auto mr-0 xl:mr-4 xlmd:mr-8 pt-0 xl:pt-2 min-w-auto xl:min-w-x200 xlmd:min-w-x232">
+                                {% elsif forloop.index == column_three %}
+                                  </ul><ul class="menu-col list-none w-full min-w-full xl:border-b-0 border-border-default xl:w-auto mr-0 xl:mr-4 xlmd:mr-8 pt-0 xl:pt-2 min-w-auto xl:min-w-x200 xlmd:min-w-x232">
+                                {% elsif forloop.index == column_two %}
+                                   </ul><ul class="menu-col list-none w-full min-w-full xl:border-b-0 border-border-default xl:w-auto mr-0 xl:mr-4 xlmd:mr-8 pt-0 xl:pt-2 min-w-auto xl:min-w-x200 xlmd:min-w-x232">
+                                {% elsif forloop.index == column_first %}
+                                   </ul><ul class="menu-col list-none w-full min-w-full xl:border-b-0 border-border-default xl:w-auto mr-0 xl:mr-4 xlmd:mr-8 pt-0 xl:pt-2 min-w-auto xl:min-w-x200 xlmd:min-w-x232">
+                                {% endif %}
+                              {% endif %}
+                              <li class="menu-links list-none level2 relative border-b xl:border-b-0 border-border-default xl:mt-8 {% if links.links != blank %}has-submenu{% endif %}">
+                                <a class="menulv2 no-underline flex items-center xl:inline relative text-grey-900 hover:text-grey-900 xl:hover:text-accent-1 text-base font-bold" href="{{ links.url }}" {% if links.links != blank %}onclick="if (window.innerWidth < 1280){return false;}"{% endif %}>
+                                  <span class="block w-full xl:w-auto p-5 xl:p-0">{{ links.title }}</span>
+                                  {%- if links.links != blank -%}
+                                    <svg class="icon-open block xl:hidden absolute top-2/4 right-5 -translate-y-1/2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M16.25 7.5L10 13.75L3.75 7.5" stroke="#164569" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                  {% endif %}
+                                </a>
+                                <!-- Submenu -->
+                                {%- if links.links != blank -%}
+                                  {% assign countItems = links.links %}
+                                  <ul class="menu-sup list-none mt-0 xl:mt-2 transition-all ease-ease max-h-0 xl:max-h-full duration-500 z-50 opacity-0 xl:opacity-100 invisible xl:visible bg-white z-50 h-0 xl:h-auto overflow-hidden xl:overflow-visible">
+                                    <li class="menu-links menu-links {% if countItems.size > 8 %} xl:grid grid-rows-8 grid-flow-col gap-x-7 {% else %} xl:block {% endif %} list-none level3 my-0 {% if links.title contains "Shop by Size" %} w-full xl:w-x203 {% endif %}">
+                                      {%- for childlink in links.links -%}
+                                        <a class="mega-menu__link mega-menu__link--level-2 block no-underline last:mb-0{% if childlink.title contains "~icon:" %} block lg:mb-2 mb-3{% else %} mb-2.5{% endif %}" 
+                                          href="{{ childlink.url }} {% if childlink.current %} mega-menu__link--active{% endif %}"
+                                          {% if childlink.current %} aria-current="page" {% endif %}>
+
+                                          {% if childlink.title contains "~icon:" %}
+                                            <span class="flex items-center px-5 xl:px-0">
+                                              {% assign splitChildLink = childlink.title | split: "~icon:" %}
+                                              {% assign icon_blocks = blocks | where: 'type', 'icon_image' %}
+                                              {% if icon_blocks.size > 0 %}
+                                                {% for mainBlock in icon_blocks %}
+                                                  {% if mainBlock.settings.handle == splitChildLink.last %}
+                                                    <p class="function-image m-0 mr-3">
+                                                      <img src="{{ mainBlock.settings.image | image_url: width: 24 }}" loading="lazy">
+                                                    </p>  
+                                                  {% endif %}
+                                                {% endfor %}                                            
+                                              {% endif %}
+                                              <span class="block xl:inline text-grey-700 hover:text-accent-1 font-normal text-sm leading-5.5 relative after:hidden after:xl:block after:content-empty after:w-full after:absolute after:left-0 after:-bottom-0.5 after:scale-x-0 hover:after:scale-x-100 after:transition-textTFOP after:duration-double-0.3s after:ease-double-ease after:delay-double-0s after:origin-left-center hover:after:border-b-2 hover:after:border-secondary w-full xl:w-auto mt-px">{{ splitChildLink.first }}</span>
+                                            </span>
+                                          {% else %}
+                                            <span class="block xl:inline text-grey-700 hover:text-accent-1 font-normal text-sm leading-5.5 relative after:hidden after:xl:block after:content-empty after:w-full after:absolute after:left-0 after:-bottom-0.5 after:scale-x-0 hover:after:scale-x-100 after:transition-textTFOP after:duration-double-0.3s after:ease-double-ease after:delay-double-0s after:origin-left-center hover:after:border-b-2 hover:after:border-secondary w-full xl:w-auto px-5 xl:px-0">{{ childlink.title }}</span>
+                                          {% endif %}
+                                        </a>
+                                      {% endfor %}
+                                    </li>
+                                  </ul>
+                                {% endif %}
+                              </li>
+                            {% endfor %}
+                          </ul>
+
+                          <!-- Menu brands -->
+                        </div>
+                        {% if mainBlock.settings.promo_image_banner != blank %}
+                          <div class="col-promo-banner h-max xl:pt-6 xl:pt-10 xl:pb-10 block">
+                            {% if mainBlock.type == 'main-item' %}
+                              <div class="promo-menu-banner mb-5 xl:mb-0 px-5 xl:px-0 overflow-hidden rounded-sm">
+                                <a class="no-underline overflow-hidden rounded-sm block" href="{% if mainBlock.settings.menu_promo_banner_url != blank %}{{ mainBlock.settings.menu_promo_banner_url }}{% else %}#{% endif %}">
+                                  <img class="min-w-x224 w-80 xl:w-56 max-w-full xl:h-promo-image object-cover scale-100 hover:scale-105 duration-200 m-0 block rounded-sm {% if mainBlock.settings.promo_image_banner_mobile != blank %} hidden xl:block{% endif %}" loading="lazy" src="{{ mainBlock.settings.promo_image_banner | img_url: 'master' }}"/>
+                                  {% if mainBlock.settings.promo_image_banner_mobile != blank %}
+                                    <img class="object-cover scale-100 hover:scale-105 duration-200 m-0 block rounded-sm block xl:hidden" loading="lazy" src="{{ mainBlock.settings.promo_image_banner_mobile | img_url: 'master' }}"/>
+                                  {% endif %}
+                                </a>
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                        {% if mainBlock.type == 'brand-item' %}
+                          {% include 'mega-menu-brand' %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="overlay-desktop"></div>
+                </div>
+              </div>
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    {% include 'mega-menu-icon-mobile' %}
+  </div>
+</div>
+<div id="ammenu-menu-overlay-mobile" class="ammenu-menu-overlay-mobile fixed top-0 left-0 w-full h-screen cursor-pointer bg-dark-overlay hidden xl:!hidden z-30"></div>

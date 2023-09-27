@@ -1,0 +1,11 @@
+<div class="nav_customer w-full md:w-18.75 w-full w-full">
+    {%- assign menu_linklist = linklists[section.settings.menu].links -%}
+    <h3 id="customer-nav-title" class="rounded-t-sm md:pointer-events-none m-0 font-semibold md:text-lg text-base !leading-6 text-grey-900 px-6 md:pt-x23 md:pb-x19 py-x15 border border-border-default flex justify-between text-secondary">Useful Information<span class="md:hidden plus" id="nav-plus">{%- render 'plus' -%}</span><span class="hidden minus" id="nav-minus">{%- render 'minus' -%}</span></h3>
+    <ul id="customer-nav-content" class="rounded-b-sm border border-border-default border-t-0 pt-2.5 pb-3.5 list-none">
+        {% for link in menu_linklist %}
+            <li class="pr-6 pl-5 py-2.5 border-l-4 border-transparent hover:border-secondary-focus hover:bg-grey-100{% if request.path == link.url %}active border-secondary-focus bg-grey-100{% endif %}"><a href="{{ link.url }}" class="text-base font-normal no-underline text-grey-900" >{{ link.title }}</a></li>
+        {% endfor %}
+    </ul>
+    {% capture src_url %}{{ 'page_navigation.js' | asset_url }}{% endcapture %}
+    {% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+</div>

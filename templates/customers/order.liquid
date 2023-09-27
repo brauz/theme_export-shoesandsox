@@ -1,0 +1,136 @@
+{% comment %} NEEDS TAILWIND {% endcomment %}
+{% section 'breadcrumb' %}
+{% assign bg_color = settings.ac_bg_color %}
+<div class="account-content-top">
+    <div class="dd:max-w-x1312 px-4 mx-auto dd:border-b-0 border-b border-solid border-border-default">
+        {% render 'account-menu', title: 'Order Details', title_mobile: 'Order Details' %}
+    </div>
+</div>
+<style>
+    @media (min-width: 768px) {
+        .account-content-top {
+            background-color: {{ bg_color }};
+        } 
+    }
+</style>
+<div class="dd:max-w-x1312 mx-auto dd:py-x72 pt-6 pb-8 px-4">
+    <div class="dd:flex block">
+        <div class="dd:w-x291 w-full p-0">
+            <div class="block sidebar_left">
+                <div class="w-full dd:mb-8 mb-6">
+                    <h2 class="dd:text-xl text-lg font-bold text-grey-900 mb-3">Account Details</h2>
+                    {{ customer.default_address | format_address }}
+                    <a href="{{ routes.account_addresses_url }}" class="text-sm text-grey-700 hover:text-accent-1 hover:underline">View addresses </a>
+                </div>
+                
+                {%- if settings.enable_store -%}
+                    <div class="block_store dd:pt-8 pt-6 dd:pb-0 pb-6 dd:mb-0 mb-6 dd:border-b-0 border-b border-t border-solid border-default">
+                        {%- if settings.ac_heading != blank -%}
+                            <h2 class="dd:text-xl text-lg font-bold text-grey-900 mb-3">{{ settings.ac_heading }}</h2>
+                        {%- endif -%}
+                        {%- if settings.ac_subheading != blank -%}
+                            <p class="font-bold text-sm !text-grey-900">{{ settings.ac_subheading }}</p>
+                        {%- endif -%}
+                        {%- if settings.ac_text_link != blank -%}
+                            <a href="{{ settings.ac_link }}" class="pb-3 block text-grey-500 hover:text-accent-1 underline">{{ settings.ac_text_link }}</a>
+                        {%- endif -%}
+                        {%- if settings.ac_content != blank -%}
+                            <p class="mb-0">{{ settings.ac_content }}</p>
+                        {%- endif -%}
+                    </div>
+                {%- endif -%}
+            </div>
+        </div> 
+        <div class="w-full account-content dd:w-full-x291 dd:pl-x74 pl-0">
+            <div class="relative flex items-start justify-between dd:items-end">
+                <div class="w-full">
+                    <h5 class="text-xl dd:text-2xl font-bold text-grey-900 mb-0">Order {{ order.name }}</h5>
+                    <p class="dd:w-full mt-1 mb-4 dd:mb-6 text-sm font-normal text-grey-700">{{ order.created_at | date: '%B %d, %Y' }} - {{ order.created_at | date:"%I:%M%P" }}</p>
+                </div>
+            </div>
+            <div>
+                <table class="w-full mb-4 dd:mb-6 table-auto">
+                    <thead class="hidden dd:table-header-group">
+                        <tr class="w-full">
+                            <th class="text-left pb-2 pr-2 text-grey-900 font-bold text-sm">Product</th>
+                            <th class="text-left pb-2 dd:pr-20 pr-2 text-grey-900 font-bold text-sm">Price</th>
+                            <th class="text-center pb-2 pl-0 dd:pr-14 pr-2 text-grey-900 font-bold text-sm">Quantity</th>
+                            <th class="text-right pb-2 pl-2 text-grey-900 font-bold text-sm">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {%- for line_item in order.line_items -%}
+                        <tr class="border-t border-border-default border-b">
+                            <td class="dd:flex block dd:w-auto w-full py-4 dd:py-6 dd:pr-2 flex flex items-center">
+                                {%- if line_item.image -%}
+                                <img class="object-contain h-x90 w-x71 mr-4" src="{{ line_item.image | image_url: width: '80' }}" width="71" height="90" alt="{{ line_item.image.alt }}" loading="lazy">
+                                {%- else -%}
+                                {{ 'product-1' | placeholder_svg_tag: 'w-16.5 mr-4 h-20 object-center object-cover rounded-lg' }}
+                                {%- endif -%}
+                                <p class="flex flex-wrap !m-0">
+                                {% assign words = line_item.title | split: ' - ' %}
+                                {% assign words2 = words[1] | replace: "/", "/ Size: " %}
+                                <span class="no-underline w-full font-bold text-grey-900 leading-x22 capitalize text-sm">{{ line_item.vendor }}</span>
+                                <a href="{{ line_item.product.url }}" class="no-underline w-full font-normal text-base text-grey-900 mb-0.5 leading-x22">{{ words[0] }}</a>
+                                <span class="w-full text-grey-500 text-sm leading-x22">Colour: {{ words2 }}</span>
+                                </p>
+                            </td>
+                            <td data-th="Price" class="text-sm font-normal dd:table-cell block dd:w-auto w-full pt-0 pb-1 dd:pt-6 dd:pb-6 pr-0 dd:pr-2 align-top border-b-0 text-grey-700 before:content-[attr(data-th)] before:inline-block before:dd:hidden before:text-sm before:font-normal before:text-grey-900 before:w-1/2 leading-x22 before:leading-x22">{{ line_item.original_price | money }}</td>
+                            <td data-th="Quantity" class="text-sm font-normal dd:table-cell block dd:w-auto w-full pt-0 pb-1 px-0 dd:pt-6 dd:pb-6 px-2 dd:pr-14 align-top text-grey-700 border-b-0 text-left dd:text-center before:content-[attr(data-th)] before:inline-block before:dd:hidden before:text-sm before:font-normal before:text-grey-900 before:w-1/2 leading-x22 before:leading-x22">{{ line_item.quantity }}</td>
+                            <td data-th="Total" class="text-sm font-normal dd:table-cell block dd:w-auto w-full pt-0 pb-4 pl-0 dd:pt-6 dd:pb-6 dd:pl-2 align-top text-grey-700 border-b-0 text-left dd:text-right before:content-[attr(data-th)] before:inline-block before:dd:hidden before:text-sm before:font-normal before:text-grey-900 before:w-1/2 leading-x22 before:leading-x22">{{ line_item.final_line_price | money }}</td>
+                        </tr>
+                    {%- endfor -%}
+                    </tbody>
+                </table>
+            </div>
+            <div> 
+                <table class="w-full mb-6 dd:mb-10 table-auto">
+                    <tbody>
+                    <tr>
+                        <td class="text-grey-700 text-sm leading-x22">Subtotal</td>
+                        <td class="text-grey-700 text-sm text-right leading-x22">{{ order.subtotal_price | money }}</td>
+                    </tr>
+                   
+                    {% if order.total_discounts != 0 %}
+                        <tr>
+                      
+                            <td class="text-grey-700 text-sm leading-x22">
+                                {%- for discount in order.discount_applications -%}
+                                Discount - {{ discount.title }}
+                                {%- endfor -%}
+                            </td>
+                            <td class="text-grey-700 text-sm text-right leading-x22">-{{order.total_discounts | money}}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="text-grey-700 text-sm leading-x22">GST</td>
+                        <td class="text-grey-700 text-sm text-right leading-x22">{{ order.tax_price | money }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-grey-700 text-sm pb-4 dd:pb-6 leading-x22">Shipping</td>
+                        <td class="text-grey-700 text-sm pb-4 dd:pb-6 text-right leading-x22">{{ order.shipping_price | money }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-4 dd:py-6 border-y border-border-default font-bold text-grey-900 leading-x22">Total</td>
+                        <td class="py-4 dd:py-6 border-y border-border-default font-bold text-grey-900 text-right leading-x22">{{ order.total_price | money }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid w-full grid-cols-1 dd:grid-cols-2 gap-6">
+                <div>
+                    <h5 class="text-lg dd:text-lg leading-6 mb-2.5 text-grey-900 font-bold">Billing Address</h5>
+                    <div class="billing-address-content text-grey-700 text-sm">
+                        <span class="!mb-4 block text-sm leading-x22">Payment Status: {{ order.financial_status_label }}</span>{{ order.billing_address | format_address }}
+                    </div>
+                </div>
+            <div>
+                <h5 class="text-lg dd:text-lg leading-6 mb-2.5 text-grey-900 font-bold">Shipping Address</h5>
+                <div class="billing-address-content text-grey-700 text-sm">
+                    <span class="!mb-4 block text-sm leading-x22">Fulfillment Status: {{ order.fulfillment_status | capitalize }}</span>
+                    {{ order.shipping_address | format_address }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

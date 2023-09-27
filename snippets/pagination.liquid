@@ -1,0 +1,17 @@
+{%- if paginate.pages > 1 -%}
+    <nav class="flex justify-center navigation" role="navigation">
+        <a href="{{ paginate.previous.url }}" class="flex items-center justify-center text-base font-normal border hover:bg-secondary-focus hover:border-secondary-focus hover:bg-primary hover:text-white {% unless paginate.previous %} hover:text-grey-900 hover:bg-transparent hover:border-border-default hover:font-normal cursor-default pointer-events-none {% endunless %}no-underline p-0 py-1.75 min-w-10 h-10 font-normal text-grey-900 rounded-l border-r-0">
+            <span class="flex justify-center items-center min-w-4.5 text-center h-full">{% render 'ChevronLeft' %}</span>
+        </a>
+        {%- for part in paginate.parts -%}
+            {%- if part.is_link -%}
+                <a href="{{ part.url }}" class="items flex items-center justify-center text-base font-normal border no-underline px-2.5 py-1.75 min-w-10 h-10 font-normal text-grey-700 hover:bg-secondary-focus hover:border-secondary-focus hover:font-bold hover:text-white hover:bg-primary border-l-0 border-r-0"><span class="inline-block min-w-4.5 text-center">{{ part.title }}</span></a>
+            {%- else -%}
+                <span class="items flex items-center justify-center text-base font-bold border no-underline px-2.5 py-1.75 min-w-10 h-10 bg-primary text-white bg-secondary-focus border-secondary-focus hover:border-secondary-focus hover:text-white border-l-0 border-r-0"><span class="inline-block min-w-4.5 text-center">{{ part.title }}</span></span>
+            {%- endif -%}
+        {%- endfor -%}
+        <a href="{{ paginate.next.url }}" class="flex items-center justify-center text-base font-normal border hover:bg-secondary-focus hover:border-secondary-focus hover:bg-primary hover:text-white {% unless paginate.next %}hover:text-grey-900 hover:bg-transparent hover:border-border-default hover:font-normal cursor-default pointer-events-none {% endunless %} no-underline p-0 py-1.75 min-w-10 h-10 font-normal text-grey-900 rounded-r">
+            <span class="flex justify-center items-center min-w-4.5 text-center h-full">{% render 'ChevronRight' %}</span>
+        </a>
+    </nav>
+{%- endif -%}

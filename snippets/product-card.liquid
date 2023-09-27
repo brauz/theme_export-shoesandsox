@@ -1,0 +1,77 @@
+{%- liquid
+  assign aspect_ratio = product.featured_image.aspect_ratio
+  if product.featured_image.aspect_ratio == nil
+      assign aspect_ratio = 1
+  endif
+-%}
+<div class="{% if class %}{{ class }} {% endif %} flex flex-col justify-between">
+  <a class="group relative block w-full h-full rounded-sm overflow-hidden" href="{{ product.url }}" style="padding-bottom: {{ 1 | divided_by: aspect_ratio | times: 100 }}%;">
+    <img src="{{ product.featured_image | image_url: width: product.featured_image.width }}" 
+        width="{{ product.featured_image.width }}" height="{{ product.featured_image.height }}" 
+        loading="lazy" 
+        alt="{{ product.featured_image.alt }}" 
+        class="absolute top-0 left-0 w-full h-full object-center object-cover lg:w-full lg:h-full group-hover:scale-105 transition-all duration-400">
+    <div class="badges-label flex flex-wrap items-center absolute left-2 top-2 z-10">
+      {% if product.compare_at_price > product.price and settings.enable_sale_badge %}
+        <img class="relative top-px w-12 h-12 mb-1.5 mr-1.5" src="{{ settings.sale_image | image_url }}" loading="lazy" />
+      {% endif %}
+
+      {% comment %} {% if product.metafields.accentuate.badge_image != blank %}
+        {% for image in product.metafields.accentuate.badge_image %}
+          <img class="relative top-px w-12 h-12 mb-1.5 mr-1.5" src="{{ image }}" loading="lazy" />
+        {% endfor %}
+      {% endif %} {% endcomment %}
+
+      {% if product.metafields.utopia.badges != blank %}
+          <img class="relative top-px w-12 h-12 mb-1.5 mr-1.5" src="{{ product.metafields.utopia.badges | image_url }}" loading="lazy" />
+      {% endif %}
+
+      {% if product.metafields.utopia.badges_secondary != blank %}
+          <img class="relative top-px w-12 h-12 mb-1.5 mr-1.5" src="{{ product.metafields.utopia.badges_secondary | image_url }}" loading="lazy" />
+      {% endif %}
+
+
+    </div>
+  </a>
+  <div class="{% if padding %}{{ padding }} {% else %}p-3 {% endif %}flex flex-wrap w-full">
+    <div class="flex item-center justify-between w-full">
+      <p class="text-grey-900 w-9/12 block text-sm font-bold text-ellipsis whitespace-nowrap overflow-hidden m-0">{{ product.vendor | strip_html }}</p>
+
+      {% if settings.show_quick_view %}
+        <a href="javascript:void(0)" handle="{{ product.handle }}" class="quick-view-feature block text-grey-900 hover:text-grey-700 w-5 h-5">{% render 'icon-bag', class: 'w-5 h-5' %}</a>
+      {% endif %}
+    </div>
+
+    <a href="{{ product.url }}" class="no-underline text-base text-grey-900 w-9/12 mb-1 md:mb-2 text-ellipsis max-w-full whitespace-nowrap overflow-hidden h-6">
+      {% if product.metafields.utopia.customer_facing_product_name != blank %}
+        {{ product.metafields.utopia.customer_facing_product_name | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III"  }}
+      {% else %}
+        {{ product.title | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III"  }}
+      {% endif %}
+    </a>
+
+    {% if product.compare_at_price > product.price %}
+      <div class="flex items-center w-full">
+        <p class="text-base font-medium text-grey-900 w-fit line-through mr-2 mb-0">{{ product.compare_at_price | money }}</p>
+        <p class="text-base font-bold text-error-content w-full mb-0">{{ product.price | money }}</p>
+      </div>
+    {% else %}
+      <p class="text-base font-bold text-grey-900 w-full m-0">{{ product.price | money }}</p>
+    {% endif %}
+    <div class="flex flex-wrap gap-x-2 items-center mt-1 md:mt-2 min-h-x12 w-full">
+    {% if product.metafields.utopia.promo_line != blank %}
+      <span class="text-xs leading-3 font-medium bg-promo-bg text-grey-900">
+        {{ product.metafields.utopia.promo_line }}
+      </span> 
+      {% if product.metafields.utopia.promo_description != blank %}
+        <div class="container-infor relative">
+          {% render 'icon-info', class: 'info-icon block cursor-pointer' %}
+          <div class="info-des hidden absolute bottom-x25 left-60-percent -translate-x-2/4 px-3 py-x9 bg-white w-x157 rounded !shadow-info text-xs text-grey-700 z-50">
+            {{ product.metafields.utopia.promo_description }}
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+    </div>
+  </div>
+</div>

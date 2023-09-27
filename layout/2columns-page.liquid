@@ -1,0 +1,74 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+    <head>
+        <meta charset="utf-8">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width,initial-scale=1,maximum-scale=1" name="viewport">
+        <meta content="" name="theme-color">
+        <link rel="canonical" href="{{ canonical_url }}">
+        <link crossorigin href="https://cdn.shopify.com" rel="preconnect">
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+        {{ 'font.css' | asset_url | stylesheet_tag }}
+        {{ 'page_navigation.css' | asset_url | stylesheet_tag }}
+
+        {%- if settings.favicon != blank -%}
+            <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: '32', height: '32' }}">
+        {%- endif -%}
+
+        <title>
+            {{ page_title }}
+            {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+            {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+            {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+        </title>
+
+        {% if page_description %}
+            <meta name="description" content="{{ page_description | escape }}">
+        {% endif %}
+
+        {{ content_for_header }}
+
+        {{ 'theme.css' | asset_url | stylesheet_tag }} {%- comment -%}Blipping Fix for AplineJS{%- endcomment -%}
+        <script>
+          window.currency = {
+            currency: '{{ shop.currency }}',
+            locale: '{{ shop.locale }}',
+            country: '{{ localization.country.iso_code }}'
+          }
+          window.show_quick_view = {{ settings.show_quick_view }};
+        </script>
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+    </head>
+
+    <body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
+        <div id="page">
+            {% section 'announcement-bar' %}
+            {% section 'header' %}
+            {% section 'infor-bar' %}
+            <main id="MainContent" role="main" tabindex="-1">
+                {% render 'breadcrumb' %}
+                {% render 'page_banner' %}
+                <div class="max-w-74.5 px-4 mx-auto md:pt-14 md:pb-x72 pt-4 pb-8 {% if page.url == '/pages/contact' %}contact-page-content{% endif %}" id="{{page.title | replace: " ", "-" | downcase }}">
+                    <div class="md:flex block">
+                        {% section 'cms-nav' %}
+
+                        <div class="page_content flex flex-col items-center md:max-w-full-x330 lg:max-w-full-x360 lg:ml-3.75 md:ml-1.875 ml-0 w-full max-w-full mt-6 md:mt-0">
+                            <div class="w-full">
+                                {{ content_for_layout }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            {% section 'footer' %}
+            {% section 'copy-right' %}
+            {% include 'swymSnippet' %}
+        </div>
+        <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    </body>
+</html>

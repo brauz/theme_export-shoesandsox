@@ -1,0 +1,45 @@
+<style>
+  .container{ margin: auto; }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .col-6{
+    width: 50%;
+  }
+  @media screen and (max-width: 500px) {
+    .col-6 {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="max-w-74.5 px-4 mx-auto md:pt-14 md:pb-x72 pt-4 pb-8 ">
+  <h1 class="page-title text-center">{{ page.title }}</h1>
+  <div class="container rte">
+    
+    <div class="row">
+      <div class="col-6">
+        <h2>Collections</h2>
+        <ul>
+          {% for c in collections %}
+            <li><a href="{{ c.url }}">{{ c.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-6">
+        <h2>Products</h2>
+          <ul>
+            {% paginate collections.all.products by 1000 %}
+                {% for product in collections.all.products %}
+                  <li>
+                    <a href="{{ product.url }}">{{ product.title }}</a>
+                  </li>
+                {% endfor %}
+            {% endpaginate %}
+          </ul>
+      </div>
+    </div>  
+  
+  </div>
+</div>

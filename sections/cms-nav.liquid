@@ -1,0 +1,19 @@
+<div class="nav_customer w-full md:w-x300 w-full btn btn-secondary show-shadow md:!shadow-none rounded-sm !block !p-0 md:after:!hidden md:!border md:!border-border-default md:!bg-white md:!rounded-sm md:!translate-y-0 md:!translate-x-0">
+    {%- assign menu_linklist = linklists[settings.cms_menu].links -%}
+    <h3 id="customer-nav-title" class="md:pointer-events-none m-0 font-bold md:text-lg text-base !leading-6 text-grey-900 px-6 md:pt-6 md:pb-3 py-4 flex justify-between capitalize">
+        {{ settings.cms_nav_title }}
+        <span class="md:hidden plus" id="nav-plus">{%- render 'plus' -%}</span>
+        <span class="hidden minus" id="nav-minus">{%- render 'minus' -%}</span>
+    </h3>
+    <ul id="customer-nav-content" class="pb-3 list-none">
+        {% for link in menu_linklist %}
+            <li class="pr-6 pl-6 py-3 hover:bg-info-bg hover:font-bold {% if request.path == link.url %}active bg-info-bg{% endif %}">
+                <a href="{{ link.url }}" class="text-base no-underline text-grey-900 hover:font-bold {% if request.path == link.url %}font-bold {% else %} font-normal{% endif %}" >
+                    {{ link.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% capture src_url %}{{ 'page_navigation.js' | asset_url }}{% endcapture %}
+    {% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+</div>

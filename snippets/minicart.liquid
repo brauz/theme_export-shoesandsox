@@ -1,0 +1,298 @@
+{% assign cart_total = cart.total_price %}
+{% assign shipping_fee = settings.shipping_fee | times: 100 %}
+{% assign cart_shipping_fee = settings.cart_shipping_fee | times: 100 %}
+{% assign fee_float = settings.cart_shipping_fee | times: 1.0 %}
+{% assign disable_delivery = true %}
+{% assign discount_total = 0 %}
+{%- for item in cart.items -%}
+{% assign item_url = item.product.url | remove: '/products/' | replace: '&-', '' | replace: "'", "" | replace: "--", "-"
+%}
+{%- assign product = all_products[item_url] -%}
+{% if product.template_suffix == blank %}
+{% assign disable_delivery = false %}
+{% endif %}
+    {% if item.variant.compare_at_price > item.variant.price %}
+        {% if item.variant.price != item.final_price %}
+            {% assign saving = item.variant.compare_at_price | minus: item.final_line_price | times: item.quantity  %}
+            {% assign discount_total = saving | plus: discount_total %}
+        {% else %}
+            {% assign saving = item.variant.compare_at_price | minus: item.variant.price | times: item.quantity %}
+            {% assign discount_total = saving | plus: discount_total %}
+        {% endif %}  	
+    {% endif %}
+{% endfor %}
+{% assign discount_total = discount_total | plus: cart.total_discount %}
+
+<div id="mini-cart-wrapper" class="mini-cart-wrapper fixed z-50 top-0 h-full bg-white w-minicart-small md:w-minicart max-w-full -right-150 duration-1500" style="">
+    <div id="cart-heading" class="cart-heading flex justify-between border-b border-border-default items-center px-6 py-3.5 md:py-4 relative">
+        <h4 class="text-grey-900 text-xl leading-8 mb-0 capitalize flex mr-10 items-center">
+            {{ 'sections.cart.minicart.title' | t }}
+            <a href="{{ settings.continue_shopping_url }}" class="text-sm leading-x22 ml-2 text-grey-700 hover:text-accent-1 font-normal">{{ settings.continue_shopping }}</a>
+        </h4>
+        <p id="close-minicart" class="close-minicart cursor-pointer flex h-full items-start pt-0 items-center mb-0 absolute right-5">
+            <svg class="hidden md:block" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23 23L9 9" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M23 9L9 23" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg class="md:hidden" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14.375 14.375L5.625 5.625" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14.375 5.625L5.625 14.375" stroke="#232323" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>                
+        </p>
+    </div>
+    <div class="mini-cart-content flex flex-col justify-between {% if cart.items == empty %}no-item{% endif %} {% unless disable_delivery %}{% if cart_total >= cart_shipping_fee %} free-shipping {% endif %}{% endunless %}">
+        <div id="mincart-loading" class="hidden fixed inset-0 m-auto z-x99 w-x50 h-x50">
+            <div class="load"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="50px" height="50px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                <path d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50" fill="#1d0e0b" stroke="none">
+                  <animateTransform attributeName="transform" type="rotate" dur="1s" repeatCount="indefinite" keyTimes="0;1" values="0 50 51;360 50 51"></animateTransform>
+                </path>
+                </svg></div>
+        </div>
+        {% if cart.items == empty %}
+        <div id="minicart-base" class="minicart-items cart-content text-center pt-10 px-0">
+            <div id="minicart-items" class="list-cart-container px-4 md:px-6 mb-8">
+                <div class='text-center'>
+                    <p class="mb-4 md:mb-6 text-center text-base text-grey-700">{{ 'sections.cart.subtitle' | t }}</p>
+                    <div class=''>
+                      <a
+                        href='{{ settings.continue_shopping_url }}'
+                        class='btn btn-secondary min-w-x220 show-shadow no-underline z-1'
+                      >
+                        {{ 'sections.cart.continue_shopping' | t }}
+                      </a>
+                    </div>
+                </div>
+            </div>
+            <div id="mini-list" class="hidden"></div>
+        </div>
+        <div class="mini_list_total">
+            <div id="minicart-actions" class="minicart-actions p-4 md:p-6 pb-6 border-t border-border-default hidden"></div>
+        </div>
+        {% else %}
+        <div id="minicart-base" class="minicart-items px-0 pb-0 md:pb-1 pt-5 md:pt-6 overflow-y-auto" data-count="{{ cart.items.size }}">
+            <div id="minicart-items" class="list-cart-container px-4 md:px-6">
+                {% if cart_total >= cart_shipping_fee %}
+                    <div class="check-shipping text-center done flex flex-col items-center w-full mx-auto">
+                      <p class="mb-0 text-input text-grey-700">🎉 You qualify for <span class="font-bold text-black">free
+                          shipping!</span></p>
+                      <div class="processing h-2.5 rounded-lg bg-grey-200 w-full overflow-hidden mt-3 mb-5 md:mb-6">
+                        <div class="processing-bar block h-2.5 rounded-l-xl bg-accent-4" style="width:100%"></div>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="check-shipping text-center flex flex-col items-center w-full mx-auto">
+                      {% assign cost = cart_shipping_fee | minus: cart_total %}
+                      {% assign cost_percent = cart_total | divided_by: fee_float %}
+                      <p class="mb-0 text-input text-grey-700">{{ 'sections.cart.spend' | t }} <span class="text-grey-900 font-bold">{{
+                          cost | money }}</span> {{ 'sections.cart.freeship' | t }}</p>
+                      <div class="processing h-2.5 rounded-lg bg-grey-200 w-full overflow-hidden mt-3 mb-5 md:mb-6">
+                        <div class="processing-bar block h-2.5 rounded-l-xl bg-accent-4" style="width:{{ cost_percent }}%"></div>
+                      </div>
+                    </div>
+                  {% endif %}
+                <div class="list-items minicart-items" data-selector="minicart-parent">
+                    {%- for item in cart.items -%}
+                     <div data-id="{{ item.id }}" class="cart-items-list border-b border-border-default last:border-b-0 pb-5 mb-5 last:mb-0">
+                        <div class="cart-item flex w-full justify-between last:mb-0"
+                            data-selector="cart-item"
+                            data-sku="{{ item.sku }}"
+                            data-qty="{{ item.quantity }}"
+                            data-name="{{ item.product.title }}"
+                            data-currency="{{ cart.currency.iso_code }}"
+                            data-price="{{ item.final_price }}"
+                        >
+                            <div class="cart-thumbnail">
+                                {% if item.image %}
+                                    {% assign item_image = item | img_url: '200x200' %}
+                                    <a href="{{ item.product.url }}" class="block w-20 h-x100 overflow-hidden">
+                                        <img width='{{ item.image.width }}' height='{{ item.image.height }}' class="w-full" src="{{ item_image }}" alt="{{ item.title }}" loading='lazy'>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ item.product.url }}" class="block w-20 h-x100 overflow-hidden flex">
+                                        {{ 'product-2' | placeholder_svg_tag: 'w-full' }}
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="cart-details w-[224px] md:w-[268px]">
+                                <div class="cart__product-info" data-cart-item-handle="{{ item.product.handle }}">
+                                    <div class="cart_item-info pl-5 relative">
+                                        <div class="cart__item-title flex justify-between min-h-x48 mb-0.5">
+                                            <div class="cart__item-des w-3/5">
+                                                {% if item.product.vendor != blank %}
+                                                    <p class="cart_product-vendor text-input font-bold no-underline block text-grey-900 !mb-0">
+                                                        {{ item.product.vendor }}
+                                                    </p>
+                                                {% endif %}
+                                                <a href="{{ item.product.url }}" class="cart_product-title text-button block whitespace-nowrap overflow-hidden overflow-ellipsis font-nomal no-underline pr-0 text-grey-900 mb-0" data-cart-item-title>
+                                                    {{ item.product.title | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III" }}
+                                                </a>
+                                            </div>
+                                            <div class="cart__product-actions absolute right-0 top-0">
+                                                <span class="cart-item__price-wrapper cart__product-price flex flex-col items-end">
+                                                    {% if item.variant.compare_at_price > item.final_price %}
+                                                        <span class="compare-price font-bold text-input text-error-content">{{ item.final_line_price | money }}</span>
+                                                        <span class="price-mini-cart price-mini-cart text-input text-grey-500 font-medium"><span class="line-through">{{ item.variant.compare_at_price | times: item.quantity | money }}</span></span>
+                                                    {% else %}
+                                                        <span class="price-mini-cart text-input block mb-0 font-bold text-grey-900">{{ item.final_line_price | money }}</span>
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {% if item.properties.Size != blank %}
+                                            <div class="cart-item--product-options text-grey-500 text-sm">
+                                                <span class="cart-item--option-name">Size: </span>
+                                                {{ item.properties.Size }}
+                                            </div>
+                                        {% endif %}
+
+                                        {% if item.properties.Width != blank %}
+                                            <div class="cart-item--product-options text-grey-500 text-sm">
+                                                <span class="cart-item--option-name">Width: </span>
+                                                {{ item.properties.Width }}
+                                            </div>
+                                        {% endif %}
+                                        <ul class="discounts hidden" role="list" aria-label="{{ 'customer.order.discount' | t }}">     
+                                        </ul>
+                                    </div>
+                                    <div class="cart__item-price pl-5 mt-1">
+                                        <div class="mincart__product-qty">
+                                            <div class="product-form-qty flex items-center justify-between">
+                                                <div class="flex items-center justify-center product-form-item md:w-auto h-12 max-w-x120 border border-border-default" data-id="{{ item.id }}">
+                                
+                                                    <span class="product-minus minus qty-button cursor-pointer w-9 h-9 flex items-center justify-center"
+                                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M15.625 10H4.375" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </span>
+                            
+                                                    <input type="number" id="Quantity-{{ section.id }}" name="updates[]"
+                                                        value="{{ item.quantity }}" min="0" pattern="[0-9]*"
+                                                        id="updates_{{ item.id }}" style="padding:0" data-id="{{ item.id }}"
+                                                        class="product-form__input h-full product-form__input--quantity !text-grey-700 text-base text-center !border-0 w-1/3 !p-0 block focus:!border-0 focus:!outline-0"
+                                                        data-quantity-input>
+                                                    <span class=" product-plus plus qty-button cursor-pointer w-9 h-9 flex items-center justify-center"
+                                                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()"
+                                                        class="plus">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M10 4.375V15.625" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M15.625 10H4.375" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+
+                                                <div id="Remove-{{ item.index | plus: 1 }}"
+                                                    data-index="{{ item.index | plus: 1 }}" class="remove-item ">
+                                                    <a href="#" class="delete text-input text-grey-500" data-cart-item="{{ item.index | plus: 1 }}" data-cart-remove data-qty="0"
+                                                        id="remove_{{ item.id }}" data-label="{{ item.title }}">Remove
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if settings.enable_brauz == true %}
+                            <div
+                                brauz-id="cart-item-message"
+                                brauz-data-cart-item-id="{{ item.id }}"
+                                style="--brauz-margin-top: 24px"
+                                ></div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="mini-list" class="hidden"></div>
+        </div>
+        <div class="mini_list_total">
+            <div id="minicart-actions" class="minicart-actions p-4 md:p-6 pb-6 border-t border-border-default">
+                {% if settings.plus_display_discount_code %}
+                    {% capture src_url %}{{ 'cart-discount.js' | asset_url }}{% endcapture %}
+                    {% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+                    {{ 'cart-discount.css' | asset_url | stylesheet_tag }}
+                <div class="discountcodefield-mini pb-2 md:pb-4 mb-4 border-b border-border-default"> 
+                    <div id="discount-title-mini" class="text-base font-bold text-grey-900 mb-2 active cursor-pointer relative">Apply Discount <span class="text-primary minus"><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                        focusable="false"
+                        role="presentation"
+                        class="icon icon-minus"
+                        fill="none"
+                        viewBox="0 0 10 2">
+                        <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z"
+                        fill="currentColor">
+                    </svg></span>
+                    <span class="text-primary plus hidden"><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                        focusable="false"
+                        role="presentation"
+                        class="icon icon-plus"
+                        fill="none"
+                        viewBox="0 0 10 10">
+                        <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z"
+                        fill="currentColor">
+                    </svg></span></div>
+                    <div id="discount-container-mini" class="overflow-hidden discount-active">
+                        <div class="field field--custom flex">
+                            <div class="field__input">
+                                <input autocomplete="off" class="w-full !border-r-0 !mb-0" type="text" name="discount" id="discount-mini" placeholder="Enter code"/>
+                                <label for="discount-mini">Enter code</label>
+                            </div>
+                            <button id="btn-discount-code-mini" class="inline-flex bg-primary border border-primary rounded-sm font-bold px-4 py-3 text-grey-900 hover:text-grey-900">
+                            <span class="text-white">Apply</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M20 10c0 5.523-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0v2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8h2z"></path></svg>          
+                            </button>
+                        </div>
+                        <div class="tags-list"></div>
+                        <span class="error-message"></span>
+                        <div id="warning-mess" class="mt-4"></div>
+                    </div>
+                </div> 
+                {% endif %}
+                {% if settings.enable_brauz == true %}
+                    <img id="brauz-shopify-cart-change-listener" src="" style="display: none;" onload="window.Brauz_shopify_helper_setupFindInStoreComponentInCart()" onerror="window.Brauz_shopify_helper_setupFindInStoreComponentInCart()"></img>
+                    <div
+                    id="brauz-click-and-collect-config-cart-drawer"
+                    data-sd="{{ shop.permanent_domain }}"
+                    style="display: none; width: 0;"
+                    >
+                    </div>
+                    <div id="brauz-click-and-collect-cart-drawer"></div>
+                {% endif %}                    
+                <div class='flex justify-between cart-discount-box{% if discount_total <= 0 %} hidden {% endif %}'>                
+                    <span class="text-base font-medium text-black">Discount total</span>
+                    <span class="text-base font-medium discount-price text-black" data-discount="{{ discount_total | minus: cart.total_discount }}">{{ discount_total | money }}</span>
+                </div>
+                <div class="minicart-total flex justify-between mb-4 cart-total-box">
+                    <span class="title-total font-bold text-base text-grey-900">
+                        {% if cart.item_count >= 2 %}
+                            {{ 'sections.cart.minicart.subtotals' | t:total: cart.item_count }}
+                        {% else %}
+                            {{ 'sections.cart.minicart.subtotal' | t:total: cart.item_count }}
+                        {% endif %}</span>
+                    <span data-price="{{cart.total_price}}" data-symbol="{{ cart.currency.symbol  }}" class="cart-total-price total-final font-bold text-grey-900">{{ cart.total_price | money }}</span>
+                </div>
+                <div class="minicart-button flex {% if settings.minicart_toggle_btn %} justify-between {% else %} justify-center {% endif %}">
+                    <a href="/checkout" class="btn btn-primary show-shadow no-underline {% if settings.minicart_toggle_btn %} w-1/2 {% else %} w-full {% endif %} mr-1.5 !py-3">Checkout</a>
+                    {% if settings.minicart_toggle_btn %}
+                        <a href="/cart" class="btn btn-hollow show-shadow no-underline w-1/2 ml-1.5 !py-3">View Cart</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div id="bg-minicart-close" class="bg-minicart-close fixed w-full top-0 left-0 h-full hidden z-40"></div>

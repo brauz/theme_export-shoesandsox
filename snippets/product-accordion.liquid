@@ -1,0 +1,47 @@
+{%- if title != blank and content != blank -%}
+    {% assign tabTitle = title | handle %}
+    <accordion-controller class="block w-full py-6 border-b border-border-default"{% if tabTitle == 'description' %} id="Tab-product-description"{% endif %}>
+        <h4 class="summary flex items-center justify-between w-full font-bold text-grey-900 cursor-pointer h-4 pr-0 md:pr-4 mb-0">
+            <span class="heading text-base font-bold leading-6 text-grey-900 ">
+                {{ title }}
+            </span>
+            <div class="chevron-arrow flex items-center">
+                <span class="flex justify-center items-center open text-primary-input w-full h-5">{% render 'icon-dropdown-up' %}</span>
+                <span class="justify-center items-center close text-primary-input w-full hidden">{% render 'icon-dropdown-down' %}</span>
+            </div>
+        </h4>
+        <div class="details text-grey-700 font-normal text-sm pr-0 md:pr-4">
+            {% if tabTitle == 'delivery-returns' %}
+                {% if product.metafields.custom.delivery_returns_text != blank %}
+                    {{ product.metafields.custom.delivery_returns_text }}
+                {% else %}
+                    {{ tabContentReturn }}
+                {% endif %}
+            {% elsif tabTitle == 'materials-details' %}
+                <ul class="m-0">
+                    {% if product.metafields.utopia.colour_code != blank %}
+                        <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.product_code' | t }}: <span class="font-normal">{{ product.metafields.utopia.colour_code }}</span></li>
+                    {% endif %}
+                    
+                    {% if product.metafields.utopia.sole_material != blank %}
+                        <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.sole_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.sole_material }}</span></li>
+                    {% endif %}
+
+                    {% if product.metafields.utopia.lining_material != blank %}
+                        <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.lining_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.lining_material }}</span></li>
+                    {% endif %}
+
+                    {% if product.metafields.utopia.upout_material != blank %}
+                        <li class="!text-grey-900 font-bold !mb-1.5">{{ 'product.upout_material' | t }}: <span class="font-normal">{{ product.metafields.utopia.upout_material }}</span></li>
+                    {% endif %}
+
+                    {% if product.metafields.utopia.coo != blank %}
+                        <li class="!text-grey-900 font-bold">{{ 'product.coo' | t }}: <span class="font-normal">{{ product.metafields.utopia.coo }}</span></li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                {{ product.description }}
+            {% endif %}
+        </div>
+    </accordion-controller>
+{%- endif -%}

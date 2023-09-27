@@ -1,0 +1,73 @@
+<div class="faq-container">
+    <div class="heading-faq">
+        <h4 class="faq-heading text-grey-900 text-xl font-bold mb-5 md:mb-6">{{ section.settings.heading }}</h4>
+    </div>
+
+    <div class="content-faq pb-10 md:pb-12">
+        {% for block in section.blocks %}
+            <div class="faq-item border-b border-border-default md:last:border-0 {% if block.settings.border_last_item %}no-border{% endif %}">
+                <accordion-dropdown class="block w-full">
+                    <h4 class="faq-title text-base cursor-pointer font-bold text-grey-900 flex items-center justify-between gap-4 my-5 md:my-6 pr-2">
+                        <span class="heading">{{ block.settings.faq_question_text }} </span>
+                        <div class="chevron-arrow flex items-center">
+                            <span class="flex justify-center items-center open text-primary-input w-full h-5">{% render 'faq-dropdown-up' %}</span>
+                            <span class="justify-center items-center close text-primary-input w-full hidden">{% render 'faq-dropdown-down' %}</span>
+                        </div>
+                    </h4>
+                    <div class="faq-content text-grey-700 text-input font-normal pr-2">
+                        {{ block.settings.faq_answer_text }}
+                    </div>
+                </accordion-dropdown>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% capture src_url %}{{ 'template-faqs.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-faqs.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+    "name": "Faq Section",
+    "settings": [
+        {
+            "type": "text",
+            "id": "heading",
+            "label": "Section heading"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "faq",
+            "name": "faq",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "faq_question_text",
+                    "label": "Faq Title",
+                    "default": "Title"
+                },
+                {
+                    "type": "text",
+                    "id": "faq_answer_text",
+                    "label": "Answer Here",
+                    "default": "Text here"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "border_last_item",
+                    "label": "Disable Border",
+                    "default": false
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Faq section"
+        }
+    ]
+} 
+{% endschema %}

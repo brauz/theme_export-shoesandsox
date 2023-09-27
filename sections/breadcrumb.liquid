@@ -1,0 +1,73 @@
+{% if section.settings.show %}
+  <ul class="flex md:py-4 py-3 px-4 mx-auto xl:px-20 items-center text-xs md:text-sm leading-4 md:leading-4 breadcrumb">
+    {% if template != 'index' %}
+      <li class="flex items-center">
+        <a class="text-xs md:text-sm leading-4 md:leading-4 underline text-grey-700 hover:text-accent-1" href="/" title="{{ 'general.breadcrumbs.home' | t }}">{{ 'general.breadcrumbs.home' | t }}</a>
+        {% render 'icon_breadcrumb', class: 'mx-1.5 md:mx-2 leading-4 text-grey-400' %}
+      </li>
+    {% endif %}
+    {% if template contains 'product' %}
+      <li class="flex items-center">
+        <span class="text-grey-500 line-clamp-1">{{ product.title | replace: " iii", " III" | replace: " ii", " II" | replace: " Ii", " II" | replace: " Iii", " III"  }}</span>
+      </li>
+    {% elsif template contains 'cart' or template contains 'page' %}
+      <li class="flex items-center">
+        <span class="text-grey-500">{{ page.title }}</span>
+      </li>
+    {% elsif template contains 'search' %}
+       <li class="flex items-center">
+        <span class="text-grey-500">Search</span>
+      </li>
+    {% elsif template contains 'collection' %}
+      <li class="flex items-center">
+        <a class="text-xs md:text-sm leading-4 md:leading-4 underline text-grey-700 hover:text-accent-1" href="{{ routes.collections_url }}/shop-all" title="Collection">Collection</a>
+        {% render 'icon_breadcrumb', class: 'mx-1.5 md:mx-2 leading-4 text-grey-400' %}
+      </li>
+      <li class="flex items-center">
+        <span class="text-grey-500">{{ collection.title }}</span>
+      </li>
+    {% elsif template contains 'blog' %}
+      <li class="flex items-center">
+        <span class="text-grey-500 line-clamp-1">{{ blog.title }}</span>
+      </li>
+    {% elsif template contains 'article' %}
+      <li class="flex items-center">
+        <a class="text-xs md:text-sm leading-4 md:leading-4 underline text-grey-700 hover:text-accent-1" href="{{ blog.url }}" title="{{ blog.title }}">{{ blog.title }}</a>
+        {% render 'icon_breadcrumb', class: 'mx-1.5 md:mx-2 leading-4 text-grey-400' %}
+      </li>
+      <li class="flex items-center">
+        <span class="text-grey-500 line-clamp-1">{{ article.title }}</span>
+      </li>
+    {% elsif template contains 'customers' %}
+      <li class="flex items-center">
+        <a class="text-xs md:text-sm leading-4 md:leading-4 underline text-grey-700 hover:text-accent-1" href="{{ routes.account_url }}" title="Customers">Account</a>
+        {% unless template contains 'account' %}
+          {% render 'icon_breadcrumb', class: 'mx-1.5 md:mx-2 leading-4 text-grey-400' %}
+        {% endunless %}
+      </li>
+      {% unless template contains 'account' %}
+        <li class="flex items-center">
+          <span class="text-grey-500 capitalize line-clamp-1">{{ template | remove: 'customers' | remove: '/' | replace: '-', ' ' | replace: '_', ' ' }}</span>
+        </li>
+      {% endunless %}
+    {% endif %}
+  </ul>
+{% endif %}
+{% schema %}
+  {
+    "name": "Breadcrumb",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show",
+        "label": "Show Breadcrumb",
+        "default": true
+      }
+    ],
+    "presets": [
+      {
+        "name": "Breadcrumb"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,38 @@
+{% capture src_url %}{{ 'account-menu.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'account-menu.css' | asset_url | stylesheet_tag }}
+{% assign bg_color = settings.ac_bg_color %}
+{% assign account_menu = settings.account_menu.links %}
+{% assign account_menu_mobile = settings.account_menu_mobile.links %}
+<style>
+    @media (max-width: 768px) {
+        .section-title {
+            background-color: {{ bg_color }};
+        }
+    }
+</style>
+<div class="md:flex gap-x-10 items-center md:py-12">
+    <div class="section-title md:py-0 py-8 md:w-auto w-full-x32 md:ml-0 -ml-4 md:text-left text-center">
+        <h1 class="m-0">
+            <span class="md:block hidden text-grey-900 font-bold text-4xl whitespace-nowrap">{{ title }}</span>
+            <span class="md:hidden block text-grey-900 font-bold text-2xl whitespace-nowrap">{{ title_mobile }}</span>
+        </h1>
+    </div>
+    <ul id="account-menu" class="flex items-center md:justify-start justify-center md:gap-8 gap-5 flex-wrap md:p-0 py-6 px-0">
+        {% for link in account_menu %}
+            <li class="md:block hidden {{ link.title | strip  | downcase  }}">
+                <a href="{{ link.url }}" class="no-underline text-base text-grey-900 border-b-2 border-solid duration-100 hover:text-grey-900 {% if request.path == link.url %}border-grey-900 active font-bold {% else %} border-transparent font-normal {% endif %} hover:border-grey-900 hover:font-bold">{{ link.title }}</a>
+            </li>
+        {% endfor %}
+
+        {% for link in account_menu_mobile %}
+            <li class="md:hidden {{ link.title | strip  | downcase  }}">
+                <a href="{{ link.url }}" class="no-underline text-base border-b-2 border-solid duration-100 hover:text-grey-900 {% if request.path == link.url %}border-grey-900 active font-bold text-grey-900 {% else %} text-grey-700 border-transparent font-normal {% endif %} hover:border-grey-900 hover:font-bold">{{ link.title }}</a>
+            </li>
+        {% endfor %}
+        <li>
+            <a href="/account/logout" class="logout-items no-underline text-base font-normal md:text-grey-900 text-grey-700 border-b-2 border-solid border-transparent hover:border-grey-900 hover:font-bold duration-100 hover:text-grey-900 ">Logout</a>
+        </li>
+    </ul>
+</div>

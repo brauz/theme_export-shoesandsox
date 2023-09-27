@@ -1,0 +1,41 @@
+{{ 'template-404.css' | asset_url | stylesheet_tag }}
+
+<div class="max-w-7xl my-10 md:mt-x156 md:mb-40 md:flex">
+  <div class="text-sm leading-x22 md:text-5xl lmd:eading-x54 font-bold text-accent-3 md:text-accent-4 md:pr-4">
+    {{ section.settings.title }}
+  </div>
+  <div class="">
+    <div class="md:text-left md:pl-4 md:border-l md:border-border-default">
+      <p class="text-2xl my-1 md:mt-0 md:mb-2 md:!leading-x42 text-grey-900 font-bold md:text-4xl">
+        {{ section.settings.subtext_title }}
+      </p>
+      <p class="text-sm !leading-x22 ">
+        {{ section.settings.subtext_description }}
+      </p> 
+    </div>
+    <div class="mt-4 md:mt-x22 md:pl-4">
+      {%- if section.settings.button_url == blank -%} {%- assign shop_url =
+      shop.secure_url -%} {%- else -%} {%- assign shop_url =
+      section.settings.button_url -%} {%- endif -%}
+      <a class="no-underline"  href="{{ shop_url }}">          
+        <button class="btn-secondary show-shadow mr-3 py-3 w-x164 md:w-x170">{{ section.settings.button_label }}</button>
+      </a> 
+      {% if section.settings.button_contact_url != blank %}
+        <a class="no-underline" href="{{ section.settings.button_contact_url }}">          
+          <button class="btn-hollow show-shadow px-2 py-3 w-x164 md:w-x170">{{ section.settings.button_contact_label }}</button>
+        </a> 
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %} { "name": "Template 404", "tag": "section", "class": "flex items-center justify-center text-center border-b border-", "settings": [ { "type":
+"text", "id": "title", "label": "404 Heading Title", "default": "404" }, {
+  "type": "text", "id": "subtext_title", "label": "404 Subtitle Text", "default":
+  "Page not found" }, {
+"type": "text", "id": "subtext_description", "label": "404 Subtitle Description", "default":
+"We can’t seem to find the page you’re looking for." }, { "type": "text", "id":
+"button_label", "label": "Button Label", "default": "Go back home" }, {
+"type": "url", "id": "button_url", "label": "Button URL" }, { "type": "text", "id":
+"button_contact_label", "label": "Button Contact Label", "default": "Contact support" }, {
+"type": "url", "id": "button_contact_url", "label": "Button Contact URL" } ] } {% endschema %}

@@ -1,0 +1,274 @@
+<script>
+  window.brands = window.brands || false;
+</script>
+{% capture src_url %}{{ 'brands.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{{ 'brands.css' | asset_url | stylesheet_tag }}
+<style>
+  [data-section-id="{{ section.id }}"] {
+    {% if section.settings.background %}
+      background-color: {{ section.settings.background }};
+    {% endif %}
+  }
+  [data-section="{{ section.id }}"] {
+    padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+    padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+  }
+  @media (min-width: 768px) {
+    [data-section="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+    }
+  }
+  @media (min-width: 1024px) {
+    [data-section="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+    }
+  }
+</style>
+{% if section.blocks.size > 0 %}
+  <div class="hidden grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 md:grid-cols-1 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 md:grid-cols-5 md:grid-cols-6 lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 lg:grid-cols-6 gap-2 gap-3 gap-4 gap-5 gap-6 gap-8 md:gap-2 md:gap-3 md:gap-4 md:gap-5 md:gap-6 md:gap-8 lg:gap-2 lg:gap-3 lg:gap-4 lg:gap-5 lg:gap-6 lg:gap-8"></div>
+  <section {% if section.settings.border_bottom %}class="border-b border-border-default" {% endif %}data-section-id="{{ section.id }}">
+    <div class="px-4 xl:px-20 mx-auto section-brands overflow-hidden " data-slider="{{ section.settings.enable_slider }}" data-item-per-slide-mobile="{{ section.settings.column_mobile }}" data-item-per-slide-tablet="{{ section.settings.column_tablet }}" data-item-per-slide-desktop="{{ section.settings.column_desktop }}" data-section="{{ section.id }}">
+      {% if section.settings.heading != blank %}
+        <h3 class="text-xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold mb-5 lg:mb-8 col-span-full text-center">{{ section.settings.heading }}</h3>
+      {% endif %}
+      <div class="{% if section.settings.enable_slider %}swiper-wrapper
+                  {% else %}
+                    grid grid-cols-{{ section.settings.column_mobile }} md:grid-cols-{{ section.settings.column_tablet }} lg:grid-cols-{{ section.settings.column_desktop }}
+                    gap-{{ section.settings.gap_mobile }} md:gap-{{ section.settings.gap_tablet }} lg:gap-{{ section.settings.gap_desktop }} lg:!grid lg:!box-border  
+                  {% endif %} lg:justify-center">
+        {% for block in section.blocks %}
+          {% if block.settings.image %}
+            <div class="{% if section.settings.enable_slider %}swiper-slide {% endif %}relative w-full h-full flex flex-col last:!mr-0 opacity-100 transition-all duration-400" data-block-id="{{ block.id }}">
+              {%- liquid
+                assign aspect_ratio = block.settings.image.aspect_ratio
+                assign aspect_ratio_mb = block.settings.image_mobile.aspect_ratio
+                if block.settings.image.aspect_ratio == nil
+                    assign aspect_ratio = 1
+                endif
+                if block.settings.image_mobile.aspect_ratio == nil
+                  assign aspect_ratio_mb = 1
+                endif
+              -%}
+              <style>
+                [data-block-id="{{ block.id }}"] .group:before {
+                  background: {{ block.settings.overlay }};
+                  opacity: {{ block.settings.opacity | divided_by: 10.0 }};
+                }
+    
+              </style>
+              {% if block.settings.image != blank %}
+                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image_mobile != blank %}!hidden md:!block {% endif %}group relative w-full h-full block rounded-sm overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1" style="padding-bottom: {{ 1 | divided_by: aspect_ratio | times: 100 }}%;">
+                  <img src="{{ block.settings.image | image_url: width: block.settings.image.width }}" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}"  alt="{{ block.settings.image.alt }}" class="absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 group-hover:opacity-80 transition-all duration-400">
+                </a>
+              {% endif %}
+              {% if block.settings.image_mobile != blank %}
+                <a {% if block.settings.new_tab %}target="_blank" {% endif %}href="{{ block.settings.url }}" class="{% if block.settings.image != blank %}md:!hidden {% endif %}group relative w-full h-full block rounded-sm overflow-hidden before:content-empty before:absolute before:top-0 before:left-0 before:w-full before:h-full before:z-1" style="padding-bottom: {{ 1 | divided_by: aspect_ratio_mb | times: 100 }}%;">
+                  <img src="{{ block.settings.image_mobile | image_url: width: block.settings.image_mobile.width }}" loading="lazy" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}"  alt="{{ block.settings.image_mobile.alt }}" class="absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 group-hover:opacity-80 transition-all duration-400">
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Brands",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "border_bottom",
+      "label": "Enable border bottom"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_slider",
+      "label": "Enable slider"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "range",
+      "id": "column_desktop",
+      "label": "Item per row",
+      "max": 6,
+      "min": 1,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "label": "Gap between items",
+      "max": 8,
+      "min": 2,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "pd_top_dt",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_dt",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Tablet"
+    },
+    {
+      "type": "range",
+      "id": "column_tablet",
+      "label": "Item per row",
+      "max": 6,
+      "min": 1,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "gap_tablet",
+      "label": "Gap between items",
+      "max": 8,
+      "min": 2,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "pd_top_tl",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_tl",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "column_mobile",
+      "label": "Item per row",
+      "max": 3,
+      "min": 1,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Gap between items",
+      "max": 8,
+      "min": 2,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "pd_top_mb",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_mb",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Brand",
+      "type": "brand",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image mobile"
+        },
+        {
+          "type": "color",
+          "id": "overlay",
+          "label": "Overlay"
+        },
+        {
+          "type": "range",
+          "id": "opacity",
+          "label": "Opacity overlay",
+          "max": 10,
+          "min": 0,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Url"
+        },
+        {
+          "type": "checkbox",
+          "id": "new_tab",
+          "label": "Open in new tab",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brands"
+    }
+  ]
+}
+{% endschema %}

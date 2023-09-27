@@ -1,0 +1,90 @@
+{% capture src_url %}{{ 'about-banner.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'about-banner.css' | asset_url | stylesheet_tag }}
+
+<div class="w-full h-full">
+    <div class="w-full m-0 mb-8 md:mb-x72 ">
+        {% if section.settings.banner_image != blank %}
+            <img src="{{ section.settings.banner_image | image_url }}" loading="lazy" alt="" width="{{ section.settings.banner_image.width }}" height="500" class="hidden md:block w-full h-auto">
+        {% endif %}
+        {% if section.settings.banner_image_mobile != blank %}
+            <img src="{{ section.settings.banner_image_mobile | image_url }}" loading="lazy" alt="" width="{{ section.settings.banner_image.width }}" height="300" class="md:hidden w-full h-auto">
+        {% endif %}
+    </div>
+
+    <div class='md:max-w-x1312 px-4 mx-auto'>
+        <div class="pb-8 md:pb-x72 {% if section.settings.enable_border_bottom %} border-b border-border-default {% endif %}">
+            <div class="w-full m-0 max-w-x920 mx-auto">
+                {% if section.settings.banner_heading != blank %}
+                    <h2 class="text-grey-900 font-bold text-2xl md:text-3xl m-0 mb-4 md:mb-6 text-center">{{ section.settings.banner_heading }}</h2> 
+                {% endif %}
+
+                {% if section.settings.banner_sub_heading != blank %}
+                    <div class="banner-sub-heading text-center">
+                        {{ section.settings.banner_sub_heading }}
+                    </div>
+                {% endif %}
+
+                {% if section.settings.button_text != blank and section.settings.link_button != blank %}
+                    <div class="text-center mt-4 md:mt-6">
+                        <a href="{{ section.settings.link_button }}" class="btn btn-primary show-shadow no-underline w-x154 !py-3">{{ section.settings.button_text }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% schema %}
+    {
+        "name": "About Banner",
+        "class": "section-banner",
+        "settings": [
+            {
+                "type": "checkbox",
+                "id": "enable_border_bottom",
+                "label": "Enable Border Bottom",
+                "default": false
+            },
+            {
+                "type": "image_picker",
+                "id": "banner_image",
+                "label": "Banner Image Desktop"
+            },
+            {
+                "type": "image_picker",
+                "id": "banner_image_mobile",
+                "label": "Banner Image Mobile"
+            },
+            {
+                "type": "text",
+                "id": "banner_heading",
+                "label": "Banner Heading",
+                "default": "This is a large headline or intro quote that might go onto two lines"
+            },
+            {
+                "type": "richtext",
+                "id": "banner_sub_heading",
+                "label": "Banner Sub Heading",
+                "default": "<p></p>"
+            },
+            {
+                "type": "text",
+                "id": "button_text",
+                "label": "Button text",
+                "default": "Learn more"
+            },
+            {
+                "type": "url",
+                "id": "link_button",
+                "label": "Link Button"
+            }
+        ],
+        "presets": [
+            {
+              "name": "About Banner"
+            }
+        ]
+    }
+{% endschema %}

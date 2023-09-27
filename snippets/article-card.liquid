@@ -1,0 +1,29 @@
+<div class="{% if class != blank %}{{ class }} {% endif %}flex flex-col !h-auto rounded-sm overflow-hidden">
+  {%- if article.image -%}
+    {%- liquid
+      assign aspect_ratio = article.image.aspect_ratio
+      if article.image.aspect_ratio == nil
+        assign aspect_ratio = 1
+      endif
+    -%}
+    <a href="{{ article.url }}" class="{% if rounded != blank %}{{ rounded }} {% endif %}group relative w-full block overflow-hidden" style="padding-bottom: {{ 1 | divided_by: aspect_ratio | times: 100 }}%;">
+      <img src="{{ article.image | image_url: width: article.image.width }}" loading="lazy" width="{{ article.image.width }}" height="{{ article.image.height }}"  alt="{{ article.image.alt }}" class="absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400">
+    </a>
+  {% else %}
+    <a href="{{ article.url }}" class="{% if rounded != blank %}{{ rounded }} {% endif %}group relative w-full block overflow-hidden" style="padding-bottom: %;">
+      {{ 'image' | placeholder_svg_tag: 'absolute top-0 left-0 block w-full h-full object-center object-cover max-w-full group-hover:scale-105 transition-all duration-400' }}
+    </a>
+  {%- endif -%}
+  <div class="{% if padding != blank %}{{ padding }} {% else %}p-6 lg:p-8 {% endif %}h-full flex flex-col justify-between bg-white">
+    <div class="mb-3">
+      <a href="{{ blog.url }}" class="text-sm leading-5.5 font-bold text-accent-3 capitalize mb-1 block no-underline" title="{{ blog.title }}">{{ blog.title }}</a>
+      <a class="font-bold {% if template.name contains 'blog' %}text-xl leading-7 {% else %}text-lg lg:text-xl lg:leading-7 leading-6 {% endif %}text-grey-900 hover:text-grey-700 block no-underline" href="{{ article.url }}" >{{ article.title }}</a>
+    </div>
+    <div>
+      {%- if article.excerpt_or_content != blank -%}
+        <p class="line-clamp-3 text-sm leading-5.5 mb-3">{{- article.excerpt_or_content | strip_html -}}</p>
+      {%- endif -%}
+      <a class="underline font-bold text-grey-700 hover:text-grey-900 inline-block text-sm leading-5.5" href="{{ article.url }}" title="{{ article.title }}">Read more</a>
+    </div>
+  </div>
+</div>

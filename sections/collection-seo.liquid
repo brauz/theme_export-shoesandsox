@@ -1,0 +1,37 @@
+{% if collection.description %}
+  <div class="seo_collection border-t border-border-default">
+    <div class="px-4 xl:px-20 py-8 md:py-x72">
+      {% if collection.title %}
+          <h5 class="text-xl md:text-2xl font-bold text-grey-900 mb-1 md:mb-2">{{ collection.title }}</h5>
+      {% endif %}
+      {% if collection.description %}
+          {% assign size = collection.description | size %}
+          <div class="collection_seo js-read-more inline [&>p]:inline [&>*]:text-lg [&>p>a]:text-lg" data-rm-words="40">
+              <p class="text_more m-0 text-smbase text-lg font-normal text-grey-700 inline" id="seotextMoreBot">
+                {{ collection.description }}
+              </p>
+          </div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Collection seo",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title_seo",
+        "label": "Title Seo",
+        "default": "Collection seo"
+      }
+    ],
+
+    "presets": [
+      {
+        "name": "Collection seo"
+      }
+    ]
+  }
+{% endschema %}

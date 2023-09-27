@@ -1,0 +1,100 @@
+{% capture src_url %}{{ 'template-blog.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{% capture src_url_landing %}{{ 'template-blog-landing.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url_landing, priority: 'normal', type: "defer" %}
+{{ 'template-blog.css' | asset_url | stylesheet_tag }}
+{%- if section.settings.menu.links == blank -%}
+  {%- assign menu_linklist = linklists[section.settings.menu].links -%}
+{%- else -%}
+  {%- assign menu_linklist = section.settings.menu.links -%}
+{%- endif -%}
+{% assign allBlogPost = blog.articles %}
+{% assign allBlogPostCount = blog.articles_count %}
+{% for link in menu_linklist %}
+  {% assign item = link.object %}
+  {% assign allBlogPostCount = allBlogPostCount | plus: item.articles_count %}
+  {% assign allBlogPost = allBlogPost | concat: item.articles | sort: 'created_at' | reverse %}
+{% endfor %}
+<h1 class="mx-auto px-4 xl:px-20 relative mb-3 md:mb-3 md:mt-4 lg:mb-6 lg:mt-8 text-center text-2xl font-bold lg:text-3xl text-grey-900">
+  {{ blog.title }}
+</h1>
+  
+<div class="mx-auto px-4 xl:px-20 overflow-hidden pb-8 md:pb-9 lg:pb-18">
+  {% if section.settings.menu.links != blank %}
+    <div class="blog-nav relative flex">
+      <div class="blog-nav-swiper flex mb-4 lg:mb-8 overflow-hidden">
+        <div class="swiper-wrapper">
+          {% for link in menu_linklist %}
+            <a href="{{ link.url }}" data-width-full="" title="Show article of {{ link.title }}" class="{% if request.path == link.url %} active !text-white !bg-primary {% endif %}swiper-slide text-ellipsis overflow-hidden whitespace-nowrap !w-auto rounded-5 lg:rounded-12.5 no-underline text-sm leading-5.5 lg:text-base lg:leading-6 font-medium text-grey-900 bg-grey-100 px-3 py-2.25 lg:px-5.5 lg:py-2.5 mr-2 last:!mr-0">{{ link.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <span class="absolute right-0 swiper-next-click-assign rounded-full flex justify-center items-center font-medium text-grey-900 bg-grey-100 px-3 py-2.25 lg:px-5.5 lg:py-2.5 mr-2 last:!mr-0 z-10 w-10 h-10 lg:w-11 lg:h-11"> {% render 'icon-arrow-right', class: 'w-4 h-4' %}</span>
+    </div>
+  {% endif %}
+  <div id="landing-desktop" class="landing-desktop hidden md:block" data-limit="{{ section.settings.number_of_blog_posts }}">
+    <div class="blog-wrapper grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-6 lg:gap-8">
+      {% for article in allBlogPost %}
+        {% if forloop.index > section.settings.number_of_blog_posts %}
+          {% render 'article-card', article: article, rounded: 'rounded-sm', padding: 'pt-5 lg:pt-8', class: 'article-card !hidden' %}
+        {% else %}
+          {% render 'article-card', article: article, rounded: 'rounded-sm', padding: 'pt-5 lg:pt-8', class: 'article-card' %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if allBlogPostCount > section.settings.number_of_blog_posts %}
+      <button type="button" class="read-more hidden md:block btn btn-secondary show-shadow mt-8 max-w-55 w-full mx-auto text-center">Show {{ allBlogPostCount | minus: section.settings.number_of_blog_posts }} more</button>
+    {% endif %}
+  </div>
+  <div id="landing-mobile" class="landing-mobile block md:hidden" data-limit="{{ section.settings.number_of_blog_posts_mb }}">
+    <div class="blog-wrapper grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-6 lg:gap-8">
+      {% for article in allBlogPost %}
+        {% if forloop.index > section.settings.number_of_blog_posts_mb %}
+          {% render 'article-card', article: article, rounded: 'rounded-sm', padding: 'pt-5 lg:pt-8', class: 'article-card !hidden' %}
+        {% else %}
+          {% render 'article-card', article: article, rounded: 'rounded-sm', padding: 'pt-5 lg:pt-8', class: 'article-card' %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if allBlogPostCount > section.settings.number_of_blog_posts_mb %}
+      <button type="button" class="read-more block btn btn-secondary show-shadow mt-6 w-full mx-auto text-center">Show {{ allBlogPostCount | minus: section.settings.number_of_blog_posts_mb }} more</button>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog",
+  "settings": [
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#fff"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation blog"
+    },
+    {
+      "type": "range",
+      "id": "number_of_blog_posts",
+      "step": 1,
+      "min": 1,
+      "max": 21,
+      "label": "Blog posts per page desktop",
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "number_of_blog_posts_mb",
+      "step": 1,
+      "min": 1,
+      "max": 21,
+      "label": "Blog posts per page mobile",
+      "default": 3
+    }
+  ]
+}
+{% endschema %}

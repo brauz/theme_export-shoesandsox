@@ -1,0 +1,48 @@
+{% capture src_url %}{{ 'swymWishlist.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{{ 'swymWishlist.css' | asset_url | stylesheet_tag }}
+
+<style>
+    #wishlist .swym-ui-component .swym-user-login-status::before,
+    #my-wishlist .swym-ui-component .swym-user-login-status::before,
+    #wishlist .swym-ui-component .swym-user-login-status.swym-has-user::before,
+    #my-wishlist .swym-ui-component .swym-user-login-status.swym-has-user::before {
+        background: url({{ 'UserCircle.svg' | asset_url }});
+    }
+
+    #wishlist .swym-ui-component .swym-wishlist-context-menu::before,
+    #my-wishlist .swym-ui-component .swym-wishlist-context-menu::before {
+        background: url({{ 'ellipsis-horizontal-outline.svg' | asset_url }});
+    }
+
+    #wishlist .swym-ui-component .swym-save-wishlist-modal .swym-save-wishlist-modal-dialog .swym-close-btn::before,
+    #my-wishlist .swym-ui-component .swym-save-wishlist-modal .swym-save-wishlist-modal-dialog .swym-close-btn::before,
+    #my-wishlist .swym-ui-component .swym-share-wishlist-modal .swym-share-wishlist-modal-dialog .swym-close-btn::before {
+        background: url({{ 'close-outline.svg' | asset_url }});
+    }
+
+    .swym-ui-component .swym-save-wishlist-modal .swym-save-wishlist-modal-dialog .swym-save-list .swym-input {
+        box-shadow: none;
+    }
+
+    .swym-ui-component .swym-wishlist-grid .swym-wishlist-item .swym-delete-btn .swym-icon::before {
+      background: url({{ 'removeWishlist.svg' | asset_url }});
+    }
+
+    #my-wishlist .swym-ui-component .swym-wishlist-context-menu .swym-wishlist-context-menu-content:after, 
+    #wishlist .swym-ui-component .swym-wishlist-context-menu .swym-wishlist-context-menu-content:after {
+        background: url({{ 'arrowWhite.svg' | asset_url }});
+    }
+
+    .swym-button.swym-add-to-wishlist.swym-heart:after {
+        background: url({{ 'heart-outline.svg' | asset_url }});
+    }
+
+    .swym-button.swym-add-to-wishlist.swym-heart.swym-added:after {
+        background: url({{ 'heart-outline2.svg' | asset_url }});
+    }
+
+    .swym-wishlist-notifications-container .swym-notifications-container .swym-details:before {
+        background: url({{ 'checkmark-outline.svg' | asset_url }});
+    }
+</style>

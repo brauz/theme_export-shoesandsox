@@ -1,0 +1,8 @@
+{% if template contains 'search' %}
+    <meta name="robots" content="noindex">
+{% endif %}
+  {% if template contains 'blog' %}
+    {% if current_tags %}
+      <meta name="robots" content="noindex">
+    {% endif %}
+{% endif %}

@@ -1,0 +1,226 @@
+{{ 'feature-products.css' | asset_url | stylesheet_tag }}
+{% assign productRecommend = section.settings.product %}
+{% if template.name == "article" %}
+  {% if article.metafields.article.related_product != blank %}
+    {% assign productRecommend = article.metafields.article.related_product.value %}
+  {% endif %}
+{% elsif template.name == "product" %}
+  {% assign productRecommend = product %}
+{% endif %}
+{% assign cartItems = '' %}
+{% for item in cart.items %}
+  {% if forloop.first %}
+    {% assign cartItems = cartItems | append: item.product.handle %}
+  {% else %}
+    {% assign cartItems = cartItems | append: ',' | append: item.product.handle %}
+  {% endif %}
+{% endfor %}
+{% capture recommendations_profile %}
+  {
+    "tags": "{{ section.settings.searchspring_tags }}",
+    "section_id": "{{ section.id }}",
+    "product": {
+      "id": "{{ productRecommend.id }}",
+      "handle": "{{ productRecommend.handle }}",
+      "sku": "{{ productRecommend.sku }}"
+    },
+    "customer": "{{ customer.id }}",
+    "cart": "{{ cartItems }}",
+    "limits": "{{ section.settings.limit }}"
+  }
+{% endcapture %}
+
+<style>
+  [data-section-id="{{ section.id }}"] {
+    padding-top: {{ section.settings.pd_top_mb | append: 'px' }};
+    padding-bottom: {{ section.settings.pd_bottom_mb | append: 'px' }};
+  }
+  @media (min-width: 768px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_tl | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_tl | append: 'px' }};
+    }
+  }
+  @media (min-width: 1024px) {
+    [data-section-id="{{ section.id }}"] {
+      padding-top: {{ section.settings.pd_top_dt | append: 'px' }};
+      padding-bottom: {{ section.settings.pd_bottom_dt | append: 'px' }};
+    }
+  }
+</style>
+<div class="{% if section.settings.border_bottom %}border-b border-border-default{% endif %}" data-section-id="{{ section.id }}" tracking-click="false" tracking-impression="false">
+  <div class="md:px-4 xl:px-20 mx-auto overflow-hidden">
+    <div class="section-feature-products overflow-hidden" data-selector="searchspring-carousel" data-searchspring-profile='{{ recommendations_profile }}' data-section="{{ section.id }}" data-item-per-slide-mobile="{{ section.settings.column_mobile }}" data-item-per-slide-tablet="{{ section.settings.column_tablet }}" data-item-per-slide-desktop="{{ section.settings.column_desktop }}">
+      {% if section.settings.title != blank %}    
+        <div class="flex items-center mb-4 lg:mb-8 px-4 md:px-0">
+          <span class="swiper-prev text-grey-400 w-5 h-5 lg:w-8 lg:h-8 flex justify-center items-center cursor-default max-md:order-2">{% render 'icon-chevron-left', class: 'w-5 h-5 lg:w-8 lg:h-8' %}</span>
+          {% if section.settings.title != blank %}
+            <h3 class="text-xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold m-0 mx-auto max-md:order-1 max-md:ml-0">{{ section.settings.title }}</h3>
+          {% endif %}
+          <span class="swiper-next text-grey-400 w-5 h-5 lg:w-8 lg:h-8 flex justify-center items-center cursor-default max-md:order-3">{% render 'icon-chevron-right', class: 'w-5 h-5 lg:w-8 lg:h-8' %}</span>
+        </div>
+      {% endif %}
+      <div class="product-wrapper gap-x-2 lg:gap-x-4 swiper-wrapper md:pr-0 pr-4">
+      </div>
+      <div class="swiper-feature-products-pagination mx-auto mt-6 lg:mt-10 flex justify-center max-w-49 w-full text-center leading-0"></div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  window['seedBeacon'] = [];
+  if (document.body.classList.contains('template-product')) {
+    window['seedBeacon'] = "{{ product.variants[0].sku }}";
+  } else if (document.body.classList.contains('template-cart')) {
+    {% for item in cart.items %}
+      window['seedBeacon'].push({sku:"{{ item.product.variants[0].sku }}"});
+    {% endfor %}
+  } else {
+    window['seedBeacon'] = null;
+  }
+</script>
+{% capture src_url %}{{ 'feature-products.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+{% schema %}
+{
+  "name": "Feature products",
+  "settings": [
+    {
+      "type": "header",
+      "content": "SearchSpring info"
+    },
+    {
+      "type": "text",
+      "id": "searchspring_tags",
+      "default": "api-test",
+      "label": "SearchSpring Tags"
+    },
+    {
+      "type": "header",
+      "content": "Style content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "border_bottom",
+      "label": "Enable border bottom"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_slider",
+      "label": "Enable slider",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Number products to show",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "range",
+      "id": "column_desktop",
+      "label": "Item per row",
+      "max": 5,
+      "min": 1,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "pd_top_dt",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_dt",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Tablet"
+    },
+    {
+      "type": "range",
+      "id": "column_tablet",
+      "label": "Item per row",
+      "max": 4,
+      "min": 1,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "pd_top_tl",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_tl",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "column_mobile",
+      "label": "Item per row",
+      "max": 3,
+      "min": 1,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "pd_top_mb",
+      "label": "Padding top",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "pd_bottom_mb",
+      "label": "Padding bottom",
+      "max": 100,
+      "min": 0,
+      "step": 2,
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Feature products"
+    }
+  ]
+}
+{% endschema %}

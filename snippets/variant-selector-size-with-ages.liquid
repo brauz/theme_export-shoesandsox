@@ -1,0 +1,200 @@
+{% comment %}
+	Used later for neater label printing
+	The space in the name is required to prevent additional appends
+{% endcomment %}
+{% assign size_types = "CM ,EURO ,WOMENS UK ,WOMENS US ,MENS UK ,MENS US ,KIDS UK ,KIDS US " | split: "," %}
+{% assign default_size_scheme = product.metafields.utopia.default_size_range | default: "US" %}
+
+{% comment %}
+  Prepare / correct size fragments. Size fragments are sections of the variant value. 
+{% endcomment %}
+
+{% if default_size_scheme == "EURO" %}
+	{% assign default_size_scheme = "EURO " %}
+{% endif %}
+{% assign size_fragment_womens = "WOMENS " | append: default_size_scheme | append: " " %}
+{% assign size_fragment_mens = "MENS " | append: default_size_scheme | append: " " %}
+{% assign size_fragment_kids = "KIDS " | append: default_size_scheme | append: " " %}
+
+{% assign size_option = product.options_with_values | where: "name", "Size" | first  %}
+{% assign all_size_values = size_option.values | split: "," %}
+{% assign unprocessed_age_groups = all_size_values | where: "Age Group" | uniq %}
+{% assign unprocessed_approx_age = all_size_values | where: "ApproxAge" | uniq %}
+
+{% comment %}
+	The previous statements get unique values, but through liquid type conversions includes array / string artifacts
+{% endcomment %}
+{% assign processed_age_groups = unprocessed_age_groups | remove: "[" | remove: "]"  | remove: '"' | remove: "," %}
+{% assign processed_approx_age = unprocessed_approx_age | remove: "[" | remove: "]"  | remove: '"' | remove: "," %}
+
+{% assign unique_age_groups = processed_age_groups | remove: 'Age Group ' | split: " " | uniq %}
+{% assign unique_approx_age = processed_approx_age | remove: 'ApproxAge ' | split: " " | uniq %}
+
+{%- assign default_size_range = product.metafields.utopia.default_size_range -%}
+{% assign variants_option1_arr = product.variants | map: 'option1' %}
+{% assign variants_available_arr = product.variants | map: 'available' %}
+{% assign firstVariant = variants_option1_arr[0] | split: ',' %}
+
+{% assign bigger_product_reference_type = product.metafields.utopia.bigger_product_reference.type %}
+{% assign bigger_product_reference_value = product.metafields.utopia.bigger_product_reference.value %}
+{% assign smaller_product_reference_type = product.metafields.utopia.smaller_product_reference.type %}
+{% assign smaller_product_reference_value = product.metafields.utopia.smaller_product_reference.value %}
+
+{% assign is_show_smaller_option = true %}
+
+<div class="flex items-center justify-between mb-2 lg:mb-5 mt-6">
+    <div class="relative">
+        <p class="text-sm font-bold text-grey-900 leading-x22 block m-0 relative">Size:
+            <span id="drop_areas" data-selector="selected-size-schema" class="text-sm font-bold text-secondary cursor-pointer">{{ default_size_range }}</span>
+            <span id="arrow-areas" class="absolute top-1/4 right-[-15px]">{% render 'icon-dropdown-product' %}</span>
+        </p>
+        <div id="areas_box" class="absolute top-7 left-0 py-2 px-6 !shadow-dropdown bg-white border border-border-dropdown rounded-sm overflow-hidden w-[152px] z-50">
+            <ul>
+                {% for item in firstVariant %}
+                    {% for size_type in size_types %}
+                        {% assign label = item | where: size_type | last | remove: size_type %}	
+
+                        {% if label == '' or label == ' ' or label contains 'WO' %}
+                            {% continue %}
+                        {% endif %}
+
+                        <li size-type="{{ size_type }}" class="text-grey-900 text-sm font-normal cursor-pointer hover:underline {% if size_type == 'CM ' %}hidden{% endif %}">{{ size_type }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-4">
+      <p id="product-sizeguide" class="m-0 text-accent-1 text-sm font-normal leading-x22 underline cursor-pointer flex flex-wrap items-center">{% render 'icon-rule', class: 'w-4 h-4' %} Size Guide</p>
+
+      {%- if product.metafields.utopia.fit_tips != blank -%}
+        <p id="product-tips-btn" class="m-0 text-accent-1 text-sm font-normal leading-x22 underline cursor-pointer flex flex-wrap items-center gap-x-1.5">{% render 'icon-questions', class: 'w-4 h-4' %} Fit Tips</p>
+    	{%- endif -%}
+    </div>
+</div>
+
+{% for age_group in unique_age_groups %}
+	{% assign clean_age_group = age_group | remove: "\" %}
+	{% assign relevant_values = size_option.values | where: clean_age_group %}
+    {% assign sizeOfArray = unique_age_groups.size | minus: 1 %}
+	<div class="mb-0 md:mb-5 last:mb-0">
+		<div class="mb-2">
+            <span id="default-size-{{ forloop.index }}" class="text-grey-900 font-bold text-sm leading-x22">
+                {% if clean_age_group == 'Younger' or clean_age_group == 'Older' %}
+                    {{ 'general.kids' | t }}
+                {% else %}
+                    {{ clean_age_group }}
+                {% endif %}
+            </span>
+            <span class="text-grey-700 font-normal text-sm leading-x22">{% unless clean_age_group == "Adult" %}({{ unique_approx_age[forloop.index0] }}){% endunless %}</span>
+        </div>
+		<fieldset class="size-container w-full flex flex-wrap items-center justify-start gap-2">
+            {% if smaller_product_reference_value and is_show_smaller_option == true %}
+                {% if smaller_product_reference_type == 'list.product_reference' %}
+                    {% for smaller_product in smaller_product_reference_value %}
+                        {% if forloop.first %}
+                        <a href = "{{shop.url | append: "/products/" | append: smaller_product.handle }}" class="smaller-product no-underline w-[57px] rounded-sm h-12 bg-size-bg hover:bg-secondary hover:text-white items-center justify-center text-grey-900 relative" title="{{ smaller_product.title }}">
+                            {% render 'icon-smaller-product', class: 'w-5 h-5 text-grey-900 self-center justify-self-center  absolute top-[5px] right-5' %}
+                            <span class="text-xs text-grey-900 w-full h-auto text-center absolute top-[22px] right-0">{{ 'product.smaller' | t }}</span>
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if smaller_product_reference_type == 'product_reference' %}
+                    <a href = "{{shop.url | append: "/products/" | append: smaller_product_reference_value.handle }}" class="smaller-product no-underline w-[57px] rounded-sm h-12 bg-size-bg hover:bg-secondary hover:text-white items-center justify-center text-grey-900 relative" title="{{ smaller_product_reference_value.title }}">
+                        {% render 'icon-smaller-product', class: 'w-5 h-5 text-grey-900 self-center justify-self-center  absolute top-[5px] right-5' %}
+                        <span class="text-xs text-grey-900 w-full text-center absolute top-[22px] right-0">{{ 'product.smaller' | t }}</span>
+                    </a>
+                {% endif %}  
+                
+                {% assign is_show_smaller_option = false %}
+            {% endif %}
+
+			{% for value in relevant_values %}
+                {%- liquid
+                    assign option_disabled = true
+                    for option1_name in variants_option1_arr
+                        case size_option.position
+                            when 1
+                            if variants_option1_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                            endif
+                            when 2
+                            if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                            endif
+                            when 3
+                            if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                            endif
+                        endcase
+                    endfor
+                -%}
+
+                <div data-selector="size-item-parent" class="size-item relative w-[57px] rounded-sm h-12 {% if option_disabled %}disabled{% endif %}">
+                    <input 
+                        value="{{ value }}"
+                        type="radio"
+                        name="variant-size"
+                        class="size-custom absolute inset-0 !block !w-full !h-full z-10 !rounded-none opacity-0 cursor-pointer m-0 {% if option_disabled %}disabled{% endif %}"
+                    >
+                        <label
+                            class="label-size absolute inset-0 w-full h-full w-full rounded-sm h-12 border-0 overflow-hidden flex items-center justify-center uppercase bg-size-bg text-grey-900 font-bold text-sm leading-x14 flex-col gap-0.5 hover:bg-secondary hover:text-white"
+                        >
+                            <span class="text-grey-900 text-xs font-normal leading-x12 block label-size-option">{{ default_size_scheme }}</span>
+                            {% for size_type in size_types %}
+                                {% comment %}
+                                    MENS returns both WOMENS and MENS during the where filter - in this case, we can reliably use last instead of first to get the size for mens.
+                                    The space in the name is required to prevent additional appends
+                                {% endcomment %}
+                                {% if size_type == "MENS UK " or size_type == "MENS US " %}
+                                    {% assign label = value | split: "," | where: size_type | last | remove: size_type %}
+                                {% else  %}
+                                    {% assign label = value | split: "," | where: size_type | first | remove: size_type %}
+                                {% endif %}
+                                {% if label == "" %}
+                                    {% continue %}
+                                {% endif %}
+                                {% comment %}
+                                    Hide all spans except the default. It will only ever be one of womens, mens, or kids
+                                {% endcomment %}
+                                
+                                <span 
+                                    data-size-type="{{ size_type }}"
+                                    class="{%- unless size_type == size_fragment_womens or size_type == size_fragment_mens or size_type == size_fragment_kids or size_type == default_size_scheme -%}hidden{%- endunless -%}"
+    
+                                >
+                                    {{- label -}}
+                                </span>
+                            {% endfor %}
+                        </label>
+                    </input>
+                </div>
+			{% endfor %}
+
+            {% if clean_age_group == 'Older' %}
+                {%if bigger_product_reference_value %}
+                    {% if bigger_product_reference_type == 'list.product_reference' %}
+                        {% for bigger_product in bigger_product_reference_value %}
+                            {% if forloop.first %}
+                                <a href = "{{shop.url | append: "/products/" | append: bigger_product.handle }}" class="bigger-product no-underline w-[57px] rounded-sm h-12 bg-size-bg hover:bg-secondary hover:text-white items-center justify-center text-grey-900 relative" title="{{ bigger_product.title }}">
+                                    {% render 'icon-bigger-product', class: 'w-5 h-5 text-grey-900 self-center justify-self-center absolute top-[5px] right-5' %}
+                                    <span class="text-xs text-grey-900 w-full text-center absolute top-[22px] right-0">{{ 'product.bigger' | t }}</span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if bigger_product_reference_type == 'product_reference' %}
+                        <a href = "{{shop.url | append: "/products/" | append: bigger_product_reference_value.handle }}" class="bigger-product no-underline w-[57px] rounded-sm h-12 bg-size-bg hover:bg-secondary hover:text-white items-center justify-center text-grey-900 relative" title="{{ bigger_product_reference_value.title }}">
+                            {% render 'icon-bigger-product', class: 'w-5 h-5 text-grey-900 self-center justify-self-center absolute top-[5px] right-5' %}
+                            <span class="text-xs text-grey-900 w-full h-full text-center absolute top-[22px] right-0">{{ 'product.bigger' | t }}</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+		</fieldset>
+	</div>
+{% endfor %}

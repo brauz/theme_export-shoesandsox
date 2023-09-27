@@ -1,0 +1,41 @@
+{% capture src_url %}{{ 'recent-viewed-product.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'recent-viewed-product.css' | asset_url | stylesheet_tag }}
+<div class="pt-0 md:pt-8 pb-6 md:py-x72 px-0 md:px-4 xl:px-20 recent-viewed_collection border-t border-border-default">
+    <div class="recent-viewed-product-page swiper overflow-hidden mt-8 md:mt-x72 mb-8 md:mb-x60">
+        {% if section.settings.title != blank %}
+        <div class="recent-viewed-list-items flex items-center justify-between mb-4 md:mb-6 text-center px-4 md:px-0">
+            {% if section.settings.title != blank %}
+            <h3 class="text-xl leading-7 lg:text-3xl lg:leading-9 font-bold text-grey-900 m-0">{{ section.settings.title }}</h3>
+            {% endif %}
+            <div class="arrow-icon flex gap-x-2 md:gap-x-4">
+                <span class="swiper-prev text-secondary w-5 md:w-8 h-5 md:h-8 flex justify-center items-center cursor-pointer">{% render 'icon-chevron-left', class: 'w-8 h-8' %}</span>
+                <span class="swiper-next text-secondary w-5 md:w-8 h-5 md:h-8 flex justify-center items-center cursor-pointer">{% render 'icon-chevron-right', class: 'w-8 h-8' %}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="recent-viewed-product-page__content"></div>
+    </div>
+</div>
+
+{% schema %}
+    {
+        "name": "Product Recent Viewed",
+        "class": "product-recent-viewed",
+        "settings": [
+            {
+                "type": "text",
+                "id": "title",
+                "label": "Title Section",
+                "default": "Recently viewed"
+            }
+        ],
+        "presets": [
+            {
+                "name": "Product Recent Viewed"
+            }
+        ]
+    }
+{% endschema %}

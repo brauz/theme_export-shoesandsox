@@ -1,0 +1,94 @@
+{% capture src_url %}{{ 'accordion-section.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'accordion-section.css' | asset_url | stylesheet_tag }}
+<div class="md:max-w-x1312 px-4 mx-auto ">
+<div class="w-full h-full m-0 pt-8 pb-8 md:pt-x72 md:pb-x72 {% if section.settings.enable_border_bottom %}border-b border-border-default{% endif %}">
+    <div class="max-w-x920 mx-auto">
+        {% if section.settings.heading != blank %}
+            <div class="accordion-heading">
+                <h4 class="text-2xl leading-7 lg:text-3xl lg:leading-9 text-grey-900 font-bold mb-5 lg:mb-10 col-span-full text-center">{{ section.settings.heading }}</h4>
+            </div>
+        {% endif %}
+    
+        <div class="accordion-box">
+            {% for block in section.blocks %}
+                <div class="accordion-item border-b border-border-default first:mt-0 last:border-0">
+                    <accordion-dropdown class="block w-full">
+                        <h4 class="accordion-title md:text-lg cursor-pointer font-semibold text-grey-900 flex items-center justify-between gap-4 my-6 pr-2">
+                            <span class="heading text-base font-bold">{{ block.settings.faq_question_text }} </span>
+                            <div class="chevron-arrow flex items-center">
+                                <span class="flex justify-center items-center open text-primary-input w-full h-5">{% render 'faq-dropdown-up' %}</span>
+                                <span class="justify-center items-center close text-primary-input w-full hidden">{% render 'faq-dropdown-down' %}</span>
+                            </div>
+                        </h4>
+                        <div class="accordion-content text-grey-700 text-base font-normal">
+                            {{ block.settings.faq_answer_text }}
+                        </div>
+                    </accordion-dropdown>
+                </div>
+            {% endfor %}
+        </div>
+    
+        {% if section.settings.enable_button %}
+            <div class="w-full h-full text-center mt-6 md:mt-10">
+                <a href="{{ section.settings.link_button }}" class="btn btn-primary show-shadow no-underline w-full md:w-x154 !py-3">Learn More</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% schema %}
+{
+    "name": "Accordion Section",
+    "settings": [
+        {
+            "type": "text",
+            "id": "heading",
+            "label": "Section heading"
+        },
+        {
+            "type": "checkbox",
+            "id": "enable_button",
+            "label": "Enable Button",
+            "default": false
+        },
+        {
+            "type": "url",
+            "id": "link_button",
+            "label": "Link Button"
+        },
+        {
+            "type": "checkbox",
+            "id": "enable_border_bottom",
+            "label": "Enable Border Bottom",
+            "default": false
+        }
+    ],
+    "blocks": [
+        {
+            "type": "accordion",
+            "name": "Accordion",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "faq_question_text",
+                    "label": "Faq Title",
+                    "default": "Title"
+                },
+                {
+                    "type": "text",
+                    "id": "faq_answer_text",
+                    "label": "Answer Here",
+                    "default": "Text here"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Accordion section"
+        }
+    ]
+} 
+{% endschema %}

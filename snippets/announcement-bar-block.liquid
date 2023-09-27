@@ -1,0 +1,48 @@
+<div class="announcement-list box-border py-1.75 xl:py-2.5 relative z-20 xl:z-30" {%- if section.settings.background_color -%}style="color:{{- section.settings.text_color -}};background-color: {{- section.settings.background_color -}};"{%- endif -%}>
+    <div class="relative px-4 xl:px-20 w-full mx-auto ">
+        {% if settings.enable_brauz == true and section.settings.show_brauz == true %}
+            <div
+                id="brauz-find-in-store-store-locator-header"
+                class="z-10 no-underline hover:underline text-left hidden md:inline-block absolute"
+                data-sd="{{ shop.permanent_domain }}"
+            ></div>
+        {% endif %}
+        <div class="list-announcement-swiper swiper-container-free-mode overflow-hidden" data-slider="{{ section.settings.enable_slider }}">
+            <div class="list flex justify-center w-full{% unless section.settings.enable_slider %} xl:w-2/3 mx-auto md:flex-row flex-col text-center{% else %} swiper-wrapper{% endunless %}">
+                {% if section.settings.enable_slider %}
+                    <a 
+                        href="" 
+                        class="" 
+                        id="announcement-slider"
+                        {%- if section.settings.text_color -%}style="color:{{- section.settings.text_color -}};"{%- endif -%} 
+                        {% if block.settings.open_announcement_new_window %} target="_blank"{% endif %}
+                    >
+                    </a>
+                {% else %}
+                    {% for block in section.blocks %}
+                        <a href="{{ block.settings.link | default: '#' }}" class="announcement-bar__link !no-underline block hover:!underline announcement-bar__message block font-medium text-xs xl:text-sm xl:leading-5.5 px-3"
+                            {%- if section.settings.text_color -%}style="color:{{- section.settings.text_color -}};"{%- endif -%} 
+                            {% if block.settings.open_announcement_new_window %} target="_blank"{% endif %}
+                        >
+                            {{ block.settings.text }}
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        {% if section.settings.custom-right != blank %}
+            {% if section.settings.custom-right-url != blank %}
+                <a href="{{ section.settings.custom-right-url }}" class="items-center hidden xl:flex font-medium absolute top-1/2 -translate-y-1/2 right-4 xl:right-20 z-1 no-underline hover:underline"{% if section.settings.text_color %} style="color:{{ section.settings.text_color }};"{% endif %}>
+            {% else %}
+                <div class="items-center hidden xl:flex font-medium absolute top-1/2 -translate-y-1/2 right-4 xl:right-20 z-1">
+            {% endif %}
+            {% render 'icon-question', class: 'w-4.5 h-4.5 mr-1.5', color: section.settings.background_color %}
+            <span class="inline-block h-4.5">{{ section.settings.custom-right }}</span>
+            {% if section.settings.custom-right-url != blank %}
+                </a>
+            {% else %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

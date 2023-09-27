@@ -1,0 +1,59 @@
+<div class="{{ section.class }}">
+    {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+            <div class="flex items-start border-t border-border-default gap-4 md:gap-6 py-6 first:mt-6 first:md:mt-8 last:border-b last:mb-6 md:last:mb-8 md:py-8">
+                <img src="{{ block.settings.image | image_url: width: block.settings.image.width }}" alt="" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}">
+                <div class="w-full-80">
+                    <h4 class="text-lg font-bold text-grey-900 m-0 mb-2">{{ block.settings.heading_block }}</h4>
+                    <div class="delivery-text">
+                        {{ block.settings.description_block }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% capture src_url %}{{ 'template-faqs.js' | asset_url }}{% endcapture %}
+{% render 'atom_script', src: src_url, priority: 'normal', type: "defer" %}
+
+{{ 'template-faqs.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+    {
+        "name": "Delivery Block",
+        "class": "delivery-block",
+        "settings": [
+            
+        ],
+        "blocks": [
+            {
+                "type": "delivery_block",
+                "name": "Delivery Block",
+                "settings": [
+                    {
+                        "type": "image_picker",
+                        "id": "image",
+                        "label": "Image"
+                    },
+                    {
+                        "type": "text",
+                        "id": "heading_block",
+                        "label": "Heading"
+                    },
+                    {
+                        "type": "richtext",
+                        "id": "description_block",
+                        "label": "Description",
+                        "default": "<p></p>"
+                    }
+                ]
+            }
+        ],
+        "presets": [
+            {
+                "name": "Delivery Block"
+            }
+        ]
+    }
+{% endschema %}

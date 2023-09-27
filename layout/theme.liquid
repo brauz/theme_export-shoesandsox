@@ -1,0 +1,114 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1" name="viewport">
+    <meta content="" name="theme-color">
+    
+    {% render 'force-no-index' %}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link crossorigin href="https://cdn.shopify.com" rel="preconnect">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    {{ 'font.css' | asset_url | stylesheet_tag }}
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: '32', height: '32' }}">
+    {%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {{ content_for_header }}
+
+    {% render 'gtm-head' %}
+    {{ 'theme.css' | asset_url | stylesheet_tag }} {%- comment -%}Blipping Fix for AplineJS{%- endcomment -%}
+    {{ 'page_navigation.css' | asset_url | stylesheet_tag }}
+     {% if template.suffix == 'return-center' %}
+      {{ 'return-center-custom.css' | asset_url | stylesheet_tag }}
+    {% endif %}
+    {% render 'global-variables' %}
+    {% render 'searchspring-init' %}
+    <script>
+      window.currency = {
+        currency: '{{ shop.currency }}',
+        locale: '{{ shop.locale }}',
+        country: '{{ localization.country.iso_code }}'
+      }
+      window.show_quick_view = {{ settings.show_quick_view }};
+      window.siteId = '{{ settings.searchspring_site_id }}';
+      window.customerId = '{{ customer.id }}';
+      window.template = '{{ template.name | append: "-page" }}';
+    </script>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+    <script src='//cdn.timetrade.com/scripts/lightbox/latest/lightbox.js'></script>
+    {% include 'sca.storelocator' %}
+  </head>
+
+  <body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
+    {% render 'gtm-body' %}
+    {% render 'custom-gtm-events' %}
+    <div id="page">
+      {% section 'announcement-bar' %}
+      {% section 'header' %}
+      {% include 'minicart' %}
+      {% section 'infor-bar' %}
+      <main id="MainContent" role="main" tabindex="-1">
+        {%- liquid
+          assign template_cms_nav = settings.template_cms_nav | append: ',faq,policy,contact,size-chart' | replace: ' ,', ',' | replace: ', ', ',' | split: ','
+          assign CMS_template = false
+          for template_name in template_cms_nav
+            if template.suffix == template_name
+              assign CMS_template = true
+            endif
+          endfor 
+        -%}
+
+        {% if CMS_template %}
+          {% render 'breadcrumb' %}
+          {% render 'page_banner' %}
+          <div class="max-w-74.5 px-4 mx-auto md:pt-14 md:pb-x72 pt-4 pb-8 {% if page.url == '/pages/contact' %}contact-page-content{% endif %}" id="{{page.title | replace: " ", "-" | downcase }}">
+            <div class="md:flex block">
+              {% section 'cms-nav' %}
+              <div class="page_content flex flex-col items-center md:max-w-full-x330 lg:max-w-full-x360 lg:ml-3.75 md:ml-1.875 ml-0 w-full max-w-full mt-6 md:mt-0">
+                <div class="w-full">
+                  {{ content_for_layout }}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {% assign handlePage = page_title | handle %}
+          {% if handlePage == 'about' %}
+            {% render 'breadcrumb' %}
+          {% endif %}
+          {{ content_for_layout }}
+        {% endif %}
+      </main>
+      {% section 'footer' %}
+      {% section 'bazaar-voice-footer' %}
+      {% section 'copy-right' %}
+      {% include 'swymSnippet' %}
+      {% include 'swymSnippetCustomisations' %}
+      <div class="hidden">
+        <div id="minicart-product-list" class="h-full overflow-y-auto">
+          {% section 'minicart-list' %}
+        </div>
+      </div>
+    </div>
+    {% render 'quick-view' %}
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  </body>
+</html>
