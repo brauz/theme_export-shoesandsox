@@ -26,9 +26,9 @@
                     </div>
                 {% endif %}
 
-                {% if section.settings.button_text != blank and section.settings.link_button != blank %}
+                {% if section.settings.button_text != blank %}
                     <div class="text-center mt-4 md:mt-6">
-                        <a href="{{ section.settings.link_button }}" class="btn btn-primary show-shadow no-underline w-x154 !py-3">{{ section.settings.button_text }}</a>
+                        <a class="btn btn-primary show-shadow no-underline w-x154 !py-3" onclick="window.Brauz_open_book_a_stylist_dialog()">{{ section.settings.button_text }}</a>
                     </div>
                 {% endif %}
             </div>
@@ -74,11 +74,6 @@
                 "id": "button_text",
                 "label": "Button text",
                 "default": "Learn more"
-            },
-            {
-                "type": "url",
-                "id": "link_button",
-                "label": "Link Button"
             }
         ],
         "presets": [
